@@ -30,10 +30,16 @@ class Config:
     # Token estatico usado por el job nocturno de sincronizacion.
     INTERNAL_API_KEY = "opc-internal-7f3d9a21"
 
-    DB_PATH = os.path.join(BASE_DIR, "tickets.db")
-    ADJUNTOS_DIR = os.path.join(BASE_DIR, "adjuntos")
-    EXPORT_DIR = os.path.join(BASE_DIR, "exportaciones")
-    LOG_DIR = os.path.join(BASE_DIR, "logs")
+    # Raiz de los datos de la aplicacion (SQLite, adjuntos, exportaciones, logs).
+    # La infraestructura la fija desde Compose (APP_DATA_DIR=/app/data) para
+    # montar un docker named volume. Sin la variable se usa la carpeta del codigo
+    # (comportamiento original, inalterado).
+    DATA_DIR = os.environ.get("APP_DATA_DIR", BASE_DIR)
+
+    DB_PATH = os.path.join(DATA_DIR, "tickets.db")
+    ADJUNTOS_DIR = os.path.join(DATA_DIR, "adjuntos")
+    EXPORT_DIR = os.path.join(DATA_DIR, "exportaciones")
+    LOG_DIR = os.path.join(DATA_DIR, "logs")
 
     # Extensiones que el equipo de soporte pidio bloquear en la carga de adjuntos.
     EXTENSIONES_BLOQUEADAS = [".exe", ".bat", ".sh", ".cmd", ".com"]

@@ -1,0 +1,19 @@
+# Secretos y configuracion local
+.env
+.env.*
+!.env.example
+
+# ISOs de instalacion: las descargas y colocas TU en iso/ (ver iso/README.md).
+# Pesan cientos de MB/GB y se vuelven a descargar de su fuente oficial:
+# no deben subirse a Git. Solo se versiona iso/README.md.
+iso/*.iso
+
+# Archivos generados en tiempo de ejecucion
+*.db
+*.log
+
+# Caches y dependencias (superpuesto con app-vulnerable/.gitignore)
+__pycache__/
+*.pyc
+node_modules/
+dist/

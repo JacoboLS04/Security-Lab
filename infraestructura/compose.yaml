@@ -1,0 +1,135 @@
+# Docker Compose para el despliegue 3.1/3.2 de OPC Tickets.
+# Dos replicas del backend Flask balanceadas por Nginx.
+#
+#   Cliente -> Nginx (8080) -> app1:5000
+#                            -> app2:5000
+#
+# La infraestructura vive en este directorio; consume la aplicacion original
+# desde ../app-vulnerable/backend sin modificar su codigo.
+#
+# Uso:
+#   cp .env.example .env
+#   docker compose up -d --build
+
+name: opc-tickets
+
+# Base comun de las replicas. Se definen dos servicios (app1/app2) en vez de
+# `deploy.replicas` para que funcionen igual con `docker compose` directamente
+# (sin Swarm) y para poder referenciarlas por nombre en el upstream de Nginx.
+x-app-base: &app-base
+  image: opc-backend:local
+  build:
+    # Contexto = raiz del repo (Docker exige el Dockerfile dentro del contexto;
+    # por eso es `..` desde infraestructura/). El Dockerfile copia unicamente
+    # app-vulnerable/backend, dejando la aplicacion original intacta.
+    context: ..
+    dockerfile: infraestructura/docker/backend/Dockerfile
+  env_file:
+    - .env
+  environment:
+    # El servidor Flask con debug=1 arranca un recargador que bifurca procesos
+    # y complica healthchecks/logs por replica. En este despliegue se apaga.
+    FLASK_DEBUG: "0"
+    # Raiz de los datos persistentes de la app (SQLite, adjuntos, exportaciones,
+    # logs). config.py la lee de aqui; sobre esta ruta se monta el named volume.
+    APP_DATA_DIR: /app/data
+  restart: unless-stopped
+  # Usuario sin privilegios (definido en el Dockerfile) + sin capabilities.
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  deploy:
+    resources:
+      limits:
+        cpus: "0.50"
+        memory: 256M
+
+services:
+  app1:
+    <<: *app-base
+    container_name: opc-app-1
+    volumes:
+      # Named volume PRIVADO de esta replica (NO compartido con app2).
+      # La app usa SQLite: dos procesos escribiendo en el mismo archivo
+      # provocan bloqueos/corrupcion. Cada replica persiste la suya.
+      - app-data-1:/app/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request,sys;
+          sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/api/health',
+          timeout=5).getcode()==200 else 1)
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  app2:
+    <<: *app-base
+    container_name: opc-app-2
+    volumes:
+      # Named volume PRIVADO de esta replica (NO compartido con app1). Mismo
+      # razonamiento: SQLite no soporta escritura concurrente entre procesos.
+      - app-data-2:/app/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request,sys;
+          sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:5000/api/health',
+          timeout=5).getcode()==200 else 1)
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  lb:
+    image: nginxinc/nginx-unprivileged:1.27-alpine
+    container_name: opc-lb
+    ports:
+      # 8080 en el host -> 8080 en el contenedor (imagen no-root, no usa 80).
+      - "8080:8080"
+    volumes:
+      # `z` solo tiene efecto en hosts con SELinux (Rocky/RHEL): etiqueta el
+      # archivo como container_file_t. En Debian (AppArmor) Docker lo ignora.
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro,z
+    restart: unless-stopped
+    depends_on:
+      app1:
+        condition: service_healthy
+      app2:
+        condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 64M
+
+volumes:
+  # Named volumes de persistencia de la aplicacion (SQLite + adjuntos +
+  # exportaciones + logs). Cada replica tiene el SUYO: no se comparten.
+  #
+  # Ciclo de vida:
+  #   docker compose down       -> conserva los volumes (datos intactos)
+  #   docker compose up -d      -> reutiliza los mismos volumes
+  #   docker compose down -v    -> BORRA los volumes (datos perdidos)
+  app-data-1:
+    name: app-data-1
+  app-data-2:
+    name: app-data-2

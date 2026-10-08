@@ -1,0 +1,12 @@
+# Config de build de Docker para la infraestructura (seccion 3.1/3.2).
+# Docker exige que este archivo este en la raiz del CONTEXTO de build.
+# Excluye del contexto todo lo que la imagen de la API no necesita.
+.git
+.gitignore
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+**/*.db
+**/*.log
+infraestructura/.env
