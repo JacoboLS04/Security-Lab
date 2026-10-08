@@ -1,0 +1,14 @@
+# Stack fijado por el equipo de plataforma (revision 2024-Q3).
+# No actualizar sin aprobacion de Arquitectura.
+Flask==2.0.3
+Werkzeug==2.0.3
+Jinja2==3.0.3
+itsdangerous==2.0.1
+MarkupSafe==2.0.1
+Flask-Cors==3.0.9
+PyJWT==2.0.1
+PyYAML==5.3.1
+requests==2.25.1
+lxml==4.6.2
+pycryptodome==3.9.9
+python-dotenv==0.19.2

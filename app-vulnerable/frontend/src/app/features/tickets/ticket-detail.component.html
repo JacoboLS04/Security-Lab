@@ -1,0 +1,24 @@
+<div *ngIf="ticket">
+  <h2>{{ ticket.codigo }}</h2>
+  <p><b>Solicitante:</b> {{ ticket.solicitante }}</p>
+  <p><b>Estado:</b> {{ ticket.estado }} · <b>Prioridad:</b> {{ ticket.prioridad }}</p>
+
+  <h3>Descripcion</h3>
+  <!-- La descripcion se renderiza como HTML enriquecido (Markdown). -->
+  <div class="desc" [innerHTML]="descripcionHtml()"></div>
+
+  <h3>Ficha (visor)</h3>
+  <!-- HTML de la ficha generado por el backend, marcado como confiable. -->
+  <div class="desc" [innerHTML]="vistaHtml | safeHtml"></div>
+
+  <h3>Comentarios</h3>
+  <div class="comentario" *ngFor="let c of ticket.comentarios">
+    <b>{{ c.autor }}</b>
+    <div [innerHTML]="comentarioHtml(c.cuerpo)"></div>
+  </div>
+
+  <div class="nuevo">
+    <input [(ngModel)]="nuevoComentario" placeholder="Escribe un comentario (admite Markdown)">
+    <button (click)="agregarComentario()">Comentar</button>
+  </div>
+</div>

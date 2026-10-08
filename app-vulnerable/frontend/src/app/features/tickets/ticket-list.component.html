@@ -1,0 +1,24 @@
+<h2>Tickets</h2>
+
+<div class="buscador">
+  <input [(ngModel)]="q" (keyup.enter)="buscar()" placeholder="Buscar por codigo, solicitante o descripcion">
+  <button (click)="buscar()">Buscar</button>
+</div>
+
+<!-- El termino buscado se resalta sobre el contenido de cada fila. -->
+<p *ngIf="q" class="resumen">
+  Resultados para <b [opcHighlight]="q">{{ q }}</b>
+</p>
+
+<table>
+  <tr><th>Codigo</th><th>Solicitante</th><th>Desarrollador</th><th>Estado</th><th>Prioridad</th></tr>
+  <tr *ngFor="let t of tickets" (click)="abrir(t)" style="cursor:pointer">
+    <td [opcHighlight]="q">{{ t.codigo }}</td>
+    <td [opcHighlight]="q">{{ t.solicitante }}</td>
+    <td>{{ t.desarrollador }}</td>
+    <td>{{ t.estado }}</td>
+    <td>{{ t.prioridad }}</td>
+  </tr>
+</table>
+
+<p *ngIf="cargando">Cargando...</p>

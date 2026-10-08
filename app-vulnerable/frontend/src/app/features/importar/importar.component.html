@@ -1,0 +1,19 @@
+<h2>Importar paquete de tickets</h2>
+
+<div>
+  <p>Pega el paquete exportado por el conector legado (base64).</p>
+  <textarea [(ngModel)]="payload" placeholder="payload base64..."></textarea>
+  <button (click)="importar()">Importar</button>
+  <div class="resultado" *ngIf="resultado">
+    <pre>{{ resultado }}</pre>
+  </div>
+</div>
+
+<hr>
+
+<h3>Probar regla de clasificacion</h3>
+<p>Expresion JS evaluada contra un ticket de ejemplo.</p>
+<label>Regla <input [(ngModel)]="reglaJs"></label>
+<label>Ticket demo <input [(ngModel)]="ticketDemo"></label>
+<button (click)="probarRegla()">Probar</button>
+<p>{{ vistaRegla }}</p>

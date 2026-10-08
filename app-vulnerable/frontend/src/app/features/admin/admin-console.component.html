@@ -1,0 +1,33 @@
+<h2>Consola de administracion</h2>
+
+<div class="panel">
+  <h3>Diagnostico de red</h3>
+  <p>Verifica conectividad con un host interno.</p>
+  <input [(ngModel)]="host" placeholder="host o IP">
+  <button (click)="ping()">Ping</button>
+  <pre *ngIf="salidaPing">{{ salidaPing }}</pre>
+</div>
+
+<div class="panel">
+  <h3>Probar webhook</h3>
+  <input [(ngModel)]="webhookUrl" placeholder="https://...">
+  <button (click)="probarWebhook()">Enviar evento de prueba</button>
+  <pre *ngIf="salidaWebhook">{{ salidaWebhook }}</pre>
+</div>
+
+<div class="panel">
+  <h3>Vista previa de filtro</h3>
+  <input [(ngModel)]="filtroPreview" placeholder="texto del filtro">
+  <div [innerHTML]="previewHtml()"></div>
+</div>
+
+<div class="panel">
+  <h3>Auditoria reciente</h3>
+  <table>
+    <tr><th>Actor</th><th>Accion</th><th>Detalle</th><th>IP</th><th>Fecha</th></tr>
+    <tr *ngFor="let a of auditoria">
+      <td>{{ a.actor }}</td><td>{{ a.accion }}</td>
+      <td>{{ a.detalle }}</td><td>{{ a.ip }}</td><td>{{ a.creado_en }}</td>
+    </tr>
+  </table>
+</div>
