@@ -1,0 +1,17 @@
+# Evidencia: Persistencia (down + up -d conserva los datos)
+# Generado: 2026-10-09T00:40:42Z
+tickets ANTES de down: app1=8 app2=7
+
+## docker compose down:
+
+## docker compose up -d:
+NAME        IMAGE                                     COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+opc-app-1   opc-backend:local                         "python app.py"          app1      32 seconds ago   Up 31 seconds (healthy)   5000/tcp
+opc-app-2   opc-backend:local                         "python app.py"          app2      32 seconds ago   Up 31 seconds (healthy)   5000/tcp
+opc-lb      nginxinc/nginx-unprivileged:1.27-alpine   "/docker-entrypoint.…"   lb        32 seconds ago   Up 25 seconds (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+
+tickets DESPUES de up: app1=8 app2=7
+
+## Volumenes tras down/up:
+app-data-1	/var/lib/docker/volumes/app-data-1/_data
+app-data-2	/var/lib/docker/volumes/app-data-2/_data

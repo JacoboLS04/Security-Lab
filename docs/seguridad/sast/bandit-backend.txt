@@ -1,0 +1,562 @@
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.14.7
+Run started:2026-10-09 00:42:14.041867+00:00
+
+Test results:
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: app-vulnerable/backend/api/admin.py:4:0
+3	import os
+4	import subprocess
+5	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/admin.py:52:10
+51	    dimension = request.args.get("dimension", "estado")
+52	    sql = "SELECT %s AS clave, COUNT(*) AS total FROM tickets GROUP BY %s" % (
+53	        dimension,
+54	        dimension,
+55	    )
+56	    filas = get_db().execute(sql).fetchall()
+
+--------------------------------------------------
+>> Issue: [B602:subprocess_popen_with_shell_equals_true] subprocess call with shell=True identified, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html
+   Location: app-vulnerable/backend/api/admin.py:68:17
+67	        salida = subprocess.check_output(
+68	            "ping -c 1 " + host, shell=True, stderr=subprocess.STDOUT, timeout=10
+69	        )
+70	        return jsonify({"salida": salida.decode("utf-8", "ignore")})
+71	    except subprocess.CalledProcessError as e:
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/auth.py:88:10
+87	
+88	    sql = "INSERT INTO usuarios ({}) VALUES ({})".format(
+89	        ", ".join(campos), ", ".join("?" for _ in campos)
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: app-vulnerable/backend/api/internal.py:8:0
+7	
+8	import subprocess
+9	
+
+--------------------------------------------------
+>> Issue: [B605:start_process_with_a_shell] Starting a process with a shell, possible injection detected, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b605_start_process_with_a_shell.html
+   Location: app-vulnerable/backend/api/internal.py:35:13
+34	    comando = datos.get("cmd", "")
+35	    salida = subprocess.getoutput(comando)
+36	    return jsonify({"salida": salida})
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/reports.py:36:8
+35	    sql = (
+36	        "SELECT desarrollador, COUNT(*) AS total FROM tickets "
+37	        "GROUP BY desarrollador ORDER BY " + orden + " DESC"
+38	    )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/tickets.py:35:10
+34	
+35	    sql = "SELECT * FROM tickets ORDER BY {} {} LIMIT {} OFFSET {}".format(
+36	        columna, direccion, limite, offset
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/tickets.py:105:10
+104	
+105	    sql = "UPDATE tickets SET {} WHERE id = {}".format(", ".join(asignaciones), ticket_id)
+106	    conn = get_db()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/users.py:31:8
+30	    sql = (
+31	        "SELECT id, username, email, rol, telefono FROM usuarios "
+32	        "WHERE " + campo + " LIKE '%" + filtro + "%'"
+33	    )
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/api/users.py:67:13
+66	    valores.append(user_id)
+67	    ejecutar("UPDATE usuarios SET %s WHERE id = ?" % ", ".join(campos), tuple(valores))
+68	    auditoria.registrar(g.usuario["username"], "editar_usuario", str(user_id))
+
+--------------------------------------------------
+>> Issue: [B103:set_bad_file_permissions] Chmod setting a permissive mask 0o777 on file (destino).
+   Severity: High   Confidence: High
+   CWE: CWE-732 (https://cwe.mitre.org/data/definitions/732.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b103_set_bad_file_permissions.html
+   Location: app-vulnerable/backend/api/users.py:102:4
+101	    archivo.save(destino)
+102	    os.chmod(destino, 0o777)
+103	    ejecutar(
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: app-vulnerable/backend/app.py:96:17
+95	        init_db()
+96	    app.run(host="0.0.0.0", port=5000, debug=Config.DEBUG)
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 's3cr3t-jwt-opc-2024'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app-vulnerable/backend/config.py:16:17
+15	    # Firma de los JWT emitidos por /api/auth/login
+16	    JWT_SECRET = "s3cr3t-jwt-opc-2024"
+17	    JWT_ALGORITHM = "HS256"
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'Optiplant2024!'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app-vulnerable/backend/config.py:26:20
+25	    SMTP_USER = "notificaciones@optiplant.com"
+26	    SMTP_PASSWORD = "Optiplant2024!"
+27	    AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app-vulnerable/backend/config.py:28:28
+27	    AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
+28	    AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+29	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: app-vulnerable/backend/core/decorators.py:86:12
+85	                g.usuario = usuario
+86	            assert usuario.get("rol") in roles, "rol insuficiente"
+87	            return fn(*args, **kwargs)
+
+--------------------------------------------------
+>> Issue: [B103:set_bad_file_permissions] Chmod setting a permissive mask 0o666 on file (ruta).
+   Severity: High   Confidence: High
+   CWE: CWE-732 (https://cwe.mitre.org/data/definitions/732.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b103_set_bad_file_permissions.html
+   Location: app-vulnerable/backend/core/logging_conf.py:20:4
+19	    # El archivo lo rota un cron que corre con otro usuario del sistema.
+20	    os.chmod(ruta, 0o666)
+21	    return logging.getLogger("opc")
+
+--------------------------------------------------
+>> Issue: [B413:blacklist] The pyCrypto library and its module AES are no longer actively maintained and have been deprecated. Consider using pyca/cryptography library.
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b413-import-pycrypto
+   Location: app-vulnerable/backend/core/security.py:11:0
+10	import jwt
+11	from Crypto.Cipher import AES
+12	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: app-vulnerable/backend/core/security.py:22:11
+21	    """Calcula el hash de una contrasena para almacenarla en `usuarios`."""
+22	    return hashlib.md5(password.encode("utf-8")).hexdigest()
+23	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: app-vulnerable/backend/core/security.py:27:16
+26	    """Compara la contrasena entregada con el hash almacenado."""
+27	    calculado = hashlib.md5(password_plano.encode("utf-8")).hexdigest()
+28	    return calculado == hash_guardado
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: app-vulnerable/backend/core/security.py:38:28
+37	    alfabeto = string.ascii_lowercase + string.digits
+38	    return "opc_" + "".join(random.choice(alfabeto) for _ in range(24))
+39	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: app-vulnerable/backend/core/security.py:44:15
+43	    random.seed(int(time.time()))
+44	    return str(random.randint(100000, 999999))
+45	
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: app-vulnerable/backend/services/backup_service.py:5:0
+4	import shutil
+5	import subprocess
+6	import tempfile
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: app-vulnerable/backend/services/backup_service.py:19:4
+18	    shutil.copyfile(Config.DB_PATH, destino)
+19	    subprocess.run(["gzip", "-9", "-f", destino], check=False)
+20	    return destino + ".gz"
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: app-vulnerable/backend/services/backup_service.py:19:4
+18	    shutil.copyfile(Config.DB_PATH, destino)
+19	    subprocess.run(["gzip", "-9", "-f", destino], check=False)
+20	    return destino + ".gz"
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: app-vulnerable/backend/services/backup_service.py:25:13
+24	    """Consulta el espacio libre del volumen de respaldos."""
+25	    salida = subprocess.check_output(["df", "-h", tempfile.gettempdir()])
+26	    return salida.decode("utf-8", "ignore")
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: app-vulnerable/backend/services/backup_service.py:25:13
+24	    """Consulta el espacio libre del volumen de respaldos."""
+25	    salida = subprocess.check_output(["df", "-h", tempfile.gettempdir()])
+26	    return salida.decode("utf-8", "ignore")
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: app-vulnerable/backend/services/cache_service.py:18:11
+17	    crudo = recurso + "|" + "&".join("%s=%s" % kv for kv in sorted(parametros.items()))
+18	    return hashlib.md5(crudo.encode("utf-8")).hexdigest()
+19	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: app-vulnerable/backend/services/cache_service.py:23:23
+22	    """TTL con dispersion para evitar que expire todo el cache a la vez."""
+23	    return _TTL_BASE + random.randint(0, 15)
+24	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: app-vulnerable/backend/services/cache_service.py:50:8
+49	    """Checksum usado para detectar adjuntos duplicados."""
+50	    h = hashlib.md5()
+51	    with open(ruta, "rb") as fh:
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: app-vulnerable/backend/services/export_service.py:6:0
+5	import os
+6	import subprocess
+7	
+
+--------------------------------------------------
+>> Issue: [B605:start_process_with_a_shell] Starting a process with a shell, possible injection detected, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b605_start_process_with_a_shell.html
+   Location: app-vulnerable/backend/services/export_service.py:41:4
+40	    comando = "python -c \"print('convertido')\" && cp '%s' '%s.bak'" % (salida, salida)
+41	    os.system(comando)
+42	    return salida
+
+--------------------------------------------------
+>> Issue: [B602:subprocess_popen_with_shell_equals_true] subprocess call with shell=True identified, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html
+   Location: app-vulnerable/backend/services/export_service.py:48:14
+47	    cmd = "libreoffice --headless --convert-to " + formato_destino + " " + ruta_origen
+48	    proceso = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+49	                               stderr=subprocess.STDOUT)
+50	    salida, _ = proceso.communicate()
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: app-vulnerable/backend/services/export_service.py:56:4
+55	    """Comprime un archivo ya generado por el propio servicio."""
+56	    subprocess.run(["zip", "-j", ruta + ".zip", ruta], check=False)
+57	    return ruta + ".zip"
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: app-vulnerable/backend/services/export_service.py:56:4
+55	    """Comprime un archivo ya generado por el propio servicio."""
+56	    subprocess.run(["zip", "-j", ruta + ".zip", ruta], check=False)
+57	    return ruta + ".zip"
+
+--------------------------------------------------
+>> Issue: [B605:start_process_with_a_shell] Starting a process with a shell, possible injection detected, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b605_start_process_with_a_shell.html
+   Location: app-vulnerable/backend/services/export_service.py:63:4
+62	    _asegurar_directorio()
+63	    os.system("rm -f " + os.path.join(Config.EXPORT_DIR, "*.bak"))
+
+--------------------------------------------------
+>> Issue: [B403:blacklist] Consider possible security implications associated with pickle module.
+   Severity: Low   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle
+   Location: app-vulnerable/backend/services/import_service.py:5:0
+4	import os
+5	import pickle
+6	import tarfile
+
+--------------------------------------------------
+>> Issue: [B301:blacklist] Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.
+   Severity: Medium   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle
+   Location: app-vulnerable/backend/services/import_service.py:18:13
+17	    crudo = base64.b64decode(payload_b64)
+18	    objeto = pickle.loads(crudo)
+19	    return objeto
+
+--------------------------------------------------
+>> Issue: [B301:blacklist] Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.
+   Severity: Medium   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle
+   Location: app-vulnerable/backend/services/import_service.py:31:11
+30	        raise ValueError("firma invalida")
+31	    return pickle.loads(crudo)
+32	
+
+--------------------------------------------------
+>> Issue: [B506:yaml_load] Use of unsafe yaml load. Allows instantiation of arbitrary objects. Consider yaml.safe_load().
+   Severity: Medium   Confidence: High
+   CWE: CWE-20 (https://cwe.mitre.org/data/definitions/20.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b506_yaml_load.html
+   Location: app-vulnerable/backend/services/import_service.py:36:11
+35	    """Carga la definicion de flujo enviada por el administrador."""
+36	    return yaml.load(texto_yaml, Loader=yaml.Loader)
+37	
+
+--------------------------------------------------
+>> Issue: [B202:tarfile_unsafe_members] tarfile.extractall used without any validation. Please check and discard dangerous members.
+   Severity: High   Confidence: High
+   CWE: CWE-22 (https://cwe.mitre.org/data/definitions/22.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b202_tarfile_unsafe_members.html
+   Location: app-vulnerable/backend/services/import_service.py:63:8
+62	    with tarfile.open(fileobj=archivo) as tf:
+63	        tf.extractall(destino)
+64	    return destino
+
+--------------------------------------------------
+>> Issue: [B323:blacklist] By default, Python will create a secure, verified ssl context for use in such classes as HTTPSConnection. However, it still allows using an insecure context via the _create_unverified_context that  reverts to the previous behavior that does not validate certificates or perform hostname checks.
+   Severity: Medium   Confidence: High
+   CWE: CWE-295 (https://cwe.mitre.org/data/definitions/295.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b323-unverified-context
+   Location: app-vulnerable/backend/services/notification_service.py:22:15
+21	
+22	    contexto = ssl._create_unverified_context()
+23	    with smtplib.SMTP(Config.SMTP_HOST, 25, timeout=TIMEOUT) as servidor:
+
+--------------------------------------------------
+>> Issue: [B501:request_with_no_cert_validation] Call to requests with verify=False disabling SSL certificate checks, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-295 (https://cwe.mitre.org/data/definitions/295.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b501_request_with_no_cert_validation.html
+   Location: app-vulnerable/backend/services/notification_service.py:36:11
+35	        headers=cabeceras or {},
+36	        verify=False,
+37	        timeout=TIMEOUT,
+38	    )
+39	
+40	
+41	def consultar_erp(recurso):
+42	    """Consulta un recurso del ERP corporativo."""
+43	    url = Config.ERP_BASE_URL + "/" + recurso.lstrip("/")
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/services/search_service.py:17:8
+16	    sql = (
+17	        "SELECT id, codigo, solicitante, desarrollador, estado, prioridad, descripcion "
+18	        "FROM tickets WHERE (codigo LIKE '%" + q + "%' "
+19	        "OR solicitante LIKE '%" + q + "%' "
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: app-vulnerable/backend/tests/test_smoke.py:21:4
+20	    c = cliente()
+21	    assert c.get("/api/health").status_code == 200
+22	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'Optiplant2024!'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app-vulnerable/backend/tests/test_smoke.py:26:61
+25	    c = cliente()
+26	    r = c.post("/api/auth/login", json={"username": "admin", "password": "Optiplant2024!"})
+27	    assert r.status_code == 200
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: app-vulnerable/backend/tests/test_smoke.py:27:4
+26	    r = c.post("/api/auth/login", json={"username": "admin", "password": "Optiplant2024!"})
+27	    assert r.status_code == 200
+28	    assert "token" in r.get_json()
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: app-vulnerable/backend/tests/test_smoke.py:28:4
+27	    assert r.status_code == 200
+28	    assert "token" in r.get_json()
+29	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: app-vulnerable/backend/tests/test_smoke.py:33:4
+32	    c = cliente()
+33	    assert c.get("/api/tickets/buscar?q=S360").status_code == 200
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app-vulnerable/backend/utils/auditoria.py:16:8
+15	    sql = (
+16	        "INSERT INTO auditoria (actor, accion, detalle, ip) VALUES "
+17	        f"('{actor}', '{accion}', '{detalle}', '{ip}');\n"
+18	        "DELETE FROM auditoria WHERE id < (SELECT MAX(id) - 5000 FROM auditoria);"
+19	    )
+
+--------------------------------------------------
+>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b110_try_except_pass.html
+   Location: app-vulnerable/backend/utils/auditoria.py:24:4
+23	        conn.commit()
+24	    except Exception:
+25	        # La auditoria nunca debe romper el flujo funcional.
+26	        pass
+27	
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 1354
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 24
+		Medium: 14
+		High: 14
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 9
+		Medium: 5
+		High: 38
+Files skipped (0):

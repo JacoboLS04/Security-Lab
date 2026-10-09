@@ -1,0 +1,16 @@
+# Evidencia 1/?: Estado del stack (docker compose ps)
+# Generado: 2026-10-09T00:39:33Z
+NAME        IMAGE                                     COMMAND                  SERVICE   CREATED        STATUS                    PORTS
+opc-app-1   opc-backend:local                         "python app.py"          app1      19 hours ago   Up 30 minutes (healthy)   5000/tcp
+opc-app-2   opc-backend:local                         "python app.py"          app2      19 hours ago   Up 48 minutes (healthy)   5000/tcp
+opc-lb      nginxinc/nginx-unprivileged:1.27-alpine   "/docker-entrypoint.…"   lb        19 hours ago   Up 48 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+
+# Network Docker:
+opc-tickets_default driver=bridge subnet=172.19.0.0/16
+# DNS interno desde opc-lb:
+172.19.0.2        app1  app1
+172.19.0.3        app2  app2
+
+# Volumenes:
+app-data-1	local	/var/lib/docker/volumes/app-data-1/_data
+app-data-2	local	/var/lib/docker/volumes/app-data-2/_data

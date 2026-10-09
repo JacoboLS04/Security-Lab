@@ -1,0 +1,17 @@
+# Evidencia: Hardening / configuracion de contenedores (corregida)
+# Generado: 2026-10-09T00:41:46Z
+## opc-app-1
+User=opc | Restart=unless-stopped | CapDrop=ALL | NoNewPrivileges=no-new-privileges:true | Mem=268435456 bytes | Cpus=500000000
+## opc-app-2
+User=opc | Restart=unless-stopped | CapDrop=ALL | NoNewPrivileges=no-new-privileges:true | Mem=268435456 bytes | Cpus=500000000
+## opc-lb
+User=101 | Restart=unless-stopped | CapDrop=ALL | NoNewPrivileges=no-new-privileges:true | Mem=67108864 bytes | Cpus=100000000
+
+## Healthchecks (estado vivo):
+/opc-app-1 -> healthy (failures=0)
+/opc-app-2 -> healthy (failures=0)
+/opc-lb -> healthy (failures=0)
+
+## Imagenes y versiones:
+Docker version 29.8.2, build 7fc2dff9bc
+Docker Compose version v5.4.0

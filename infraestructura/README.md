@@ -1,8 +1,15 @@
 # Infraestructura · OPC Tickets (Prueba técnica §3.1 y §3.2)
 
 Despliegue con **alta disponibilidad** de la API `opc-tickets` (backend Flask de
-`../app-vulnerable/backend`) usando **Docker Compose**, probado en **Debian 12**
-y **Rocky Linux 9**, con **persistencia de datos mediante Docker named volumes**.
+`../app-vulnerable/backend`) usando **Docker Compose**, preparado y documentado
+para **Debian 12** y **Rocky Linux 9**, con **persistencia de datos mediante
+Docker named volumes**.
+
+> **Estado de evidencias (importante):** el stack se validó y evidenció en el
+> host de desarrollo (carpeta `evidencias/`, §12.4). La ejecución **dentro** de
+> las VMs Debian/Rocky aún no se ha realizado en este equipo (las VMs se crean a
+> mano) y queda anotada como **pendiente** (→ no se afirma que el despliegue
+> esté verificado en las dos distribuciones hasta que exista esa evidencia).
 
 Este directorio es infraestructura: consume la aplicación original tal cual (la
 única modificación, mínima y opt-in, se documenta en §1).
@@ -84,8 +91,14 @@ proyecto-total/
     │   └── setup_rocky.sh     # Preparacion del SO (Docker + firewalld/SELinux)
     ├── iso/
     │   └── README.md          # ISOs recomendadas y como verificarlas
+    ├── evidencias/            # Salidas reales de las pruebas (§12.4)
     └── README.md              # Esta documentacion
 ```
+
+> El resto de la documentación de la evaluación vive en la raíz del repo:
+> `docs/infraestructura/resumen_para_claude.md` (contexto autosuficiente para
+> validar diagramas con IA) y `docs/seguridad/` (informe SAST + revisión manual,
+> parte 3.4 de la prueba).
 
 **Nota de auditoría (única modificación a la aplicación):**
 `app-vulnerable/backend/config.py` recibe una variable opcional `APP_DATA_DIR`
@@ -321,6 +334,28 @@ Ambos **verifican la distribución real** y exigen root/sudo. Se invocan con
 `bash` explícito: **no se necesita `chmod +x`** (válido si copias el archivo
 desde Windows, puesto que los permisos no viajan con el contenido).
 
+**Nota · Firewall y Docker:** las reglas abren `8080/tcp` y SSH **en la
+interfaz del host de la VM**. Consideraciones reales de la interacción con
+Docker (y por qué aquí no hay conflicto):
+
+- Docker publica `8080:8080` con **sus propias reglas de iptables** (cadenas
+  `DOCKER`/`FORWARD`), que en hosts con Docker Engine activo **se anteponen al
+  filtrado de entrada de la interfaz**. Por eso *no* debe leerse la regla de
+  UFW/firewalld como una prueba absoluta de aislamiento del puerto publicado.
+- En **Debian (UFW)** conviene mantener la política de `FORWARD` de serie y no
+  forzar `DEFAULT_FORWARD_POLICY` (el comportamiento por defecto de Docker
+  Engine con iptables ya permite la red bridge interna). El script no lo altera.
+- En **Rocky (firewalld)**: docker manipula las mismas tablas nftables/iptables;
+  la regla `8080/tcp` cubre el acceso exterior al balanceador y **no** publica
+  nada de las réplicas (`5000` queda solo en la red interna de Compose).
+- Lo que **nunca** se expone a la red exterior: `5000` (API de las réplicas) ni
+  las bases SQLite (viven en volúmenes internos). SSH queda en la red Host-Only
+  (`192.168.56.x`); si quieres limitarlo aún más, restringe su origen.
+
+Comprobaciones útiles: `[SSH · VM]` → `sudo ufw status verbose` (Debian) o
+`sudo firewall-cmd --list-all` + `sudo firewall-cmd --list-ports` (Rocky), e
+`iptables -L DOCKER -n` para ver las reglas de publicación de Docker.
+
 ## 9. FASE 6 · Clonar el repositorio
 
 `[SSH · VM]`
@@ -369,6 +404,12 @@ docker compose logs -f lb
 - **Persistencia por réplica**: cada app tiene su **propio** named volume (no
   comparten SQLite; ver §13).
 - **Prueba del balanceo sin tocar la app**: cabecera `X-Replica: <ip:puerto>`.
+- **Frontend (SPA Angular) no está en este despliegue**: el Compose levanta solo
+  la **API** (backend). El frontend existe en `../app-vulnerable/frontend` (sin
+  Dockerfile) y en desarrollo usa proxy hacia `:5000`. Servirlo detrás del
+  balanceador se documenta como **mejora opcional** en
+  `../docs/infraestructura/resumen_para_claude.md` (**Propuesto**), no se ha
+  añadido para no alterar la app ni ampliar el alcance del despliegue.
 
 ## 12. FASE 9 · Pruebas: balanceo, healthchecks y failover
 
@@ -417,6 +458,26 @@ docker compose ps     # app1 "exited"; app2 y lb "healthy"
 docker compose start app1 && sleep 20
 for i in $(seq 1 8); do curl -si http://localhost:8080/api/health | grep -i x-replica; done
 ```
+
+### 12.4 Evidencias ya capturadas
+
+La carpeta `infraestructura/evidencias/` contiene salidas reales de estas
+pruebas ejecutadas sobre el deploy en el host de desarrollo (reproducibles con
+los comandos de §12.1–§12.3 y §13.6):
+
+| Archivo | Contenido |
+|---|---|
+| `estado-stack.txt` | `compose ps`, red `172.19.0.0/16`, DNS `app1/app2`, volúmenes |
+| `balanceo-roundrobin.txt` | **10 peticiones consecutivas** con `X-Replica` alternando (5+ peticiones exigidas) |
+| `logs-nginx.txt` | access log de Nginx con `$upstream_addr` |
+| `failover.txt` | `stop app1` → 8/8 a `app2` (1 con reintento), `start app1` → reparto reanudado |
+| `persistencia.txt` | `down` + `up -d`: tickets `app1=8`/`app2=7` intactos |
+| `hardening.txt` | usuario no-root, `cap_drop=ALL`, `no-new-privileges`, límites, healthchecks |
+
+> **Pendiente**: evidencias de despliegue **dentro** de las VMs Debian 12 y
+> Rocky 9 (crear VMs → FASE 1–9). El análisis de seguridad de la app (SAST
+> backend con Bandit + SAST frontend con ESLint + revisión manual y PoCs) está
+> terminado en `../docs/seguridad/`.
 
 ## 13. Persistencia con Docker volumes
 

@@ -1,0 +1,20 @@
+# Evidencia: Round-robin (10 peticiones consecutivas a /api/health)
+# Generado: 2026-10-09T00:39:39Z
+req 01 -> X-Replica: 172.19.0.2:5000
+req 02 -> X-Replica: 172.19.0.3:5000
+req 03 -> X-Replica: 172.19.0.2:5000
+req 04 -> X-Replica: 172.19.0.3:5000
+req 05 -> X-Replica: 172.19.0.2:5000
+req 06 -> X-Replica: 172.19.0.3:5000
+req 07 -> X-Replica: 172.19.0.2:5000
+req 08 -> X-Replica: 172.19.0.3:5000
+req 09 -> X-Replica: 172.19.0.2:5000
+req 10 -> X-Replica: 172.19.0.3:5000
+
+# Healthcheck directo:
+ok
+{"servicio":"opc-tickets","status":"ok","version":"2.4.1"}
+
+# Frontend (GET / y /index.html):
+GET / -> 404
+GET /index.html -> 404
