@@ -10,6 +10,8 @@
 #   2. Habilita el servicio Docker en systemd.
 #   3. Configura el firewall UFW (SSH + 8080 del balanceador).
 #   4. Deja el usuario actual en el grupo `docker`.
+#   5. Instala `git` (necesario para clonar el repositorio en la FASE 6:
+#      no viene en la instalacion "standard utilities" de Debian).
 #
 # Nota AppArmor: en Debian AppArmor esta activo por defecto y Docker ya
 # confina los contenedores con sus propios perfiles. No requiere accion extra.
@@ -36,7 +38,7 @@ esac
 echo "==> [1/4] Dependencias base"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y ca-certificates curl gnupg
+apt-get install -y ca-certificates curl gnupg git
 
 echo "==> [2/4] Repositorio oficial de Docker"
 install -m 0755 -d /etc/apt/keyrings

@@ -1,23 +1,24 @@
-# Security-Lab · Prueba técnica OptiPlant Consultores
+# Security-Lab · Despliegue OPC Tickets (Docker Compose)
 
-Prueba técnica para el cargo de **Ingeniero de Ciberseguridad y Soporte TI
-Interno**. El repositorio se organiza en dos frentes:
+Despliegue con **alta disponibilidad** de la API `opc-tickets` (backend Flask
+de `app-vulnerable/backend`) mediante **Docker Compose**: **2 réplicas** +
+**balanceador Nginx**, con persistencia y compatibilidad Windows/Linux, y guías
+reproducibles para **Debian 12** y **Rocky Linux 9**.
 
 | Directorio | Contenido |
 |---|---|
-| `app-vulnerable/` | Aplicación de ejemplo (backend Flask + frontend Angular 15) con **vulnerabilidades intencionales** para análisis estático (§3.4). Su `README.md` explica cómo ejecutarla y las herramientas sugeridas. |
-| `infraestructura/` | Despliegue con **Docker Compose** del backend (2 réplicas + Nginx) con persistencia y compatibilidad Windows/Linux (§3.1 y §3.2). Guía completa y reproducible. |
+| `app-vulnerable/` | Aplicación de ejemplo (backend Flask + frontend Angular 15) consumida por el despliegue. Su `README.md` explica cómo ejecutarla. |
+| `infraestructura/` | Despliegue con **Docker Compose** (2 réplicas + Nginx) y scripts de preparación de SO para las VMs. Guía completa y reproducible (las capturas de pruebas las deja el responsable). |
 | `docs/infraestructura/resumen_para_claude.md` | Contexto autosuficiente para validar diagramas de infraestructura con una herramienta IA. |
-| `docs/seguridad/` | Análisis estático (SAST), informe de hallazgos de seguridad y plan de remediación. |
-| `docs/herramientas-ia.md` | Documentación y evaluación crítica de las herramientas de IA utilizadas en la evaluación. |
+| `docs/infraestructura/redes.md` | Redes de punta a punta: asignación de IPs, tipos de conexión (NAT/Host-Only/bridge Docker), DHCP, DNS y flujo de paquetes. |
+| `docs/infraestructura/pruebas-estres.md` | Plan de pruebas de carga, estrés y "fuerza bruta" sobre el balanceador, con umbrales editables para tu informe. |
 
 ## Punto de partida recomendado
 
-1. **Seguridad (parte 1 de la prueba)**: `app-vulnerable/README.md` y
-   `docs/seguridad/informe-seguridad.md`.
-2. **Infraestructura (parte 2 de la prueba)**: `infraestructura/README.md`
-   (incluye la regla de creación manual de VMs en VirtualBox y el despliegue
-   con `docker compose`).
+1. **Infraestructura**: `infraestructura/README.md` (incluye la regla de
+   creación manual de VMs en VirtualBox y el despliegue con `docker compose`).
+2. **Redes**: `docs/infraestructura/redes.md`.
+3. **Pruebas del balanceador**: `docs/infraestructura/pruebas-estres.md`.
 
 > Regla de alcance: no se automatiza la creación de VMs ni la instalación de los
 > sistemas operativos; el proyecto explica cómo hacerlo a mano y automatiza la

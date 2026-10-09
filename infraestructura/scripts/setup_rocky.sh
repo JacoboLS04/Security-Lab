@@ -13,6 +13,8 @@
 #   3. Configura firewalld (SSH + 8080 del balanceador).
 #   4. Deja el usuario actual en el grupo `docker`. SELinux permanece
 #      ENFORCING: no se relaja, el compose ya etiqueta los volumenes con :z.
+#   5. Instala `git` (la ISO Minimal de Rocky NO lo trae; lo necesita el
+#      `git clone` de la FASE 6).
 # =============================================================================
 set -euo pipefail
 
@@ -35,7 +37,7 @@ esac
 
 echo "==> [1/4] Repositorio oficial de Docker"
 if command -v dnf >/dev/null 2>&1; then
-    dnf -y install dnf-plugins-core
+    dnf -y install dnf-plugins-core git
     dnf -y config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 else
     echo "ERROR: no se encuentra dnf." >&2

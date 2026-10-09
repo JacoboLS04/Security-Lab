@@ -1,0 +1,476 @@
+REPORTE SAST - Semgrep v1.180.0
+
+Resultados totales en JSON: 52
+Resultados mostrados: 52 (ERROR=31, WARNING=18, INFO=3)
+Filtro min-severity: ninguno
+Errores de ejecucion de Semgrep: 0
+
+==============================================================================
+[ERROR] seguridad.semgrep.reglas.opc-python-inyeccion-comando
+  Ubicacion : app-vulnerable/backend/api/admin.py:67-69
+  Mensaje   : Ejecucion de comandos del sistema con shell=True, os.system o subprocess.getoutput por datos no validados. Permite inyeccion de comandos (CWE-78, OWASP A03:2021) y, si el endpoint no exige autenticacion, ejecucion remota de codigo (RCE). Ev
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Critica
+  Nota      : ping -c 1 <host> con shell=True; host del usuario. /api/admin/diagnostico/ping exige admin o soporte, pero permite ejecucion arbitraria de comandos (RCE autenticado).
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/api/admin.py:102-102
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Os.path.join(LOG_DIR, archivo) con lectura de logs; archivo desde query param permite salirse del directorio. Solo admin.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-sql-construccion-manual
+  Ubicacion : app-vulnerable/backend/api/admin.py:52-55
+  Mensaje   : Consulta SQL construida por concatenacion/interpolacion con datos variables (operador '%', .format() o '+'). Cualquiera de estos caminos puede introducir una inyeccion SQL (CWE-89) si el dato aportado por el usuario no esta previamente vali
+  CWE       : CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Dimension llega por query param sin validacion y se interpola con %s. Confirmado: /api/admin/estadisticas (requiere auth).
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/api/files.py:26-26
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : El control 'if ".." in nombre' ocurre ANTES de unquote; ..%2f lo evade y hay lectura de archivos fuera de ADJUNTOS_DIR. Requiere auth para la variante /descargar-seguro; /descargar NO exige auth.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/api/files.py:47-47
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : open(os.path.join(ADJUNTOS_DIR, nombre)) con lectura y respuesta text/html. /api/files/preview NO exige auth: lectura de cualquier archivo legible.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/api/files.py:71-71
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Escritura en disco con nombre del archivo sin normalizar (subir adjuntos). Exige auth.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-inyeccion-comando
+  Ubicacion : app-vulnerable/backend/api/internal.py:35-35
+  Mensaje   : Ejecucion de comandos del sistema con shell=True, os.system o subprocess.getoutput por datos no validados. Permite inyeccion de comandos (CWE-78, OWASP A03:2021) y, si el endpoint no exige autenticacion, ejecucion remota de codigo (RCE). Ev
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : Needs review | Severidad final: Media
+  Nota      : Los endpoints /internal requieren require_interno; el propio blueprint NO se registra salvo que INTERNAL_API_ENABLED=True. En el paquete distribuible esta desactivado, por lo que es una exposicion latente.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-sql-construccion-manual
+  Ubicacion : app-vulnerable/backend/api/reports.py:35-38
+  Mensaje   : Consulta SQL construida por concatenacion/interpolacion con datos variables (operador '%', .format() o '+'). Cualquiera de estos caminos puede introducir una inyeccion SQL (CWE-89) si el dato aportado por el usuario no esta previamente vali
+  CWE       : CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Orden llega por query param y se concatena en ORDER BY (requiere auth). Permite inyeccion aunque limitada por GROUP BY.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/api/users.py:100-100
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Subida de avatar con nombre sin normalizar (users.py:100). Exige auth.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-sql-construccion-manual
+  Ubicacion : app-vulnerable/backend/api/users.py:30-33
+  Mensaje   : Consulta SQL construida por concatenacion/interpolacion con datos variables (operador '%', .format() o '+'). Cualquiera de estos caminos puede introducir una inyeccion SQL (CWE-89) si el dato aportado por el usuario no esta previamente vali
+  CWE       : CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : campo y filtro concatenados en LIKE; /api/users/buscar requiere auth y devuelve datos de usuarios.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/config.py:39-39
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Bibliotecas/constantes config, no datos del usuario.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/config.py:40-40
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Constante de config.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/config.py:41-41
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Constante de config.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/config.py:42-42
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Constante de config.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/core/logging_conf.py:13-13
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Log fijo app.log.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-entropia-debil-token
+  Ubicacion : app-vulnerable/backend/core/security.py:43-43
+  Mensaje   : Semilla aleatoria derivada del reloj (random.seed(int(time.time()))) para generar el codigo de recuperacion de contrasena. Los codigos son predecibles (CWE-331 / CWE-338): un atacante puede regenerar la secuencia y tomar la contrasena de cu
+  CWE       : CWE-331: Insufficient Entropy, CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : random.seed(time()) permite predecir el codigo de reset en la misma ventana de segundo.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/services/backup_service.py:17-17
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: Media
+  Nota      : destino con tempfile y uuid; sin dato del usuario.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/services/backup_service.py:33-33
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: Baja
+  Nota      : El nombre proviene de os.listdir('/tmp') filtrado a opc-*.db.gz (archivos que crea el propio servicio); no hay entrada directa del usuario. Impacto limite a borrado de respaldos antiguos.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-inyeccion-comando
+  Ubicacion : app-vulnerable/backend/services/export_service.py:41-41
+  Mensaje   : Ejecucion de comandos del sistema con shell=True, os.system o subprocess.getoutput por datos no validados. Permite inyeccion de comandos (CWE-78, OWASP A03:2021) y, si el endpoint no exige autenticacion, ejecucion remota de codigo (RCE). Ev
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : os.system(comando) donde comando interpola el nombre del archivo de exportacion (mismo entrypoint y dato del usuario que export_service.py:33): inyeccion de comandos via nombre/param con formato.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-inyeccion-comando
+  Ubicacion : app-vulnerable/backend/services/export_service.py:48-49
+  Mensaje   : Ejecucion de comandos del sistema con shell=True, os.system o subprocess.getoutput por datos no validados. Permite inyeccion de comandos (CWE-78, OWASP A03:2021) y, si el endpoint no exige autenticacion, ejecucion remota de codigo (RCE). Ev
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : subprocess.Popen(cmd, shell=True) con formato_destino provisto al conversor (los formatos se validan en export_service.FORMATOS, lo que reduce el riesgo).
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-inyeccion-comando
+  Ubicacion : app-vulnerable/backend/services/export_service.py:63-63
+  Mensaje   : Ejecucion de comandos del sistema con shell=True, os.system o subprocess.getoutput por datos no validados. Permite inyeccion de comandos (CWE-78, OWASP A03:2021) y, si el endpoint no exige autenticacion, ejecucion remota de codigo (RCE). Ev
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : os.system('rm -f <EXPORT_DIR>/*.bak'); no datos del usuario.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/services/export_service.py:33-33
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Nombre del archivo de exportacion sin normalizar (nombre desde query param en /admin/exportar).
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-path-traversal-apertura
+  Ubicacion : app-vulnerable/backend/services/import_service.py:53-53
+  Mensaje   : Apertura/envio de archivo construido con os.path.join sobre un directorio base sin normalizar el nombre. Si el nombre proviene del usuario y no se valida antes, un atacante puede leer/escribir fuera del directorio previsto (path traversal, 
+  CWE       : CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+  OWASP     : A01:2021 - Broken Access Control
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Escritura de archivos dentro de un zip sin validar los nombres: zip-slip real (importar-zip). Exige auth. CWE-22/CWE-434.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-pickle-inseguro
+  Ubicacion : app-vulnerable/backend/services/import_service.py:18-18
+  Mensaje   : Deserializacion con pickle.loads de datos aportados por el usuario. pickle es inseguro frente a gadgets: un payload malicioso puede ejecutar codigo arbitrario al deserializar (CWE-502, OWASP A08:2021). Evidencia: api/importar.py -> services
+  CWE       : CWE-502: Deserialization of Untrusted Data
+  OWASP     : A08:2021 - Software and Data Integrity Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Critica
+  Nota      : pickle.loads sobre payload del usuario; /api/importar/paquete solo exige auth. Permite RCE autenticado.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-pickle-inseguro
+  Ubicacion : app-vulnerable/backend/services/import_service.py:31-31
+  Mensaje   : Deserializacion con pickle.loads de datos aportados por el usuario. pickle es inseguro frente a gadgets: un payload malicioso puede ejecutar codigo arbitrario al deserializar (CWE-502, OWASP A08:2021). Evidencia: api/importar.py -> services
+  CWE       : CWE-502: Deserialization of Untrusted Data
+  OWASP     : A08:2021 - Software and Data Integrity Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : pickle.loads tras HMAC; el endpoint exige rol admin. La clave HMAC esta expuesta en el frontend, reduce la proteccion.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-python-sql-construccion-manual
+  Ubicacion : app-vulnerable/backend/services/search_service.py:16-21
+  Mensaje   : Consulta SQL construida por concatenacion/interpolacion con datos variables (operador '%', .format() o '+'). Cualquiera de estos caminos puede introducir una inyeccion SQL (CWE-89) si el dato aportado por el usuario no esta previamente vali
+  CWE       : CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Critica
+  Nota      : SQL por concatenacion con q/estado del usuario. /api/tickets/buscar NO requiere auth (lista y buscar son publicos). Exfiltracion total de la BD sin autenticacion.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-ts-bypass-security-trust
+  Ubicacion : app-vulnerable/frontend/src/app/shared/safe-html.pipe.ts:14-14
+  Mensaje   : bypassSecurityTrustHtml marca HTML como confiable para [innerHTML] anulando la sanitizacion de Angular (CWE-79, OWASP A03:2021). Evidencia: shared/safe-html.pipe.ts:14, usado junto a marked y al HTML que arma el backend. Correccion: no usar
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : bypassSecurityTrustHtml anula la sanitizacion; base de la cadena XSS (misma debilidad que la regla estandar angular-bypasssecuritytrust).
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-ts-secretos-hardcodeados
+  Ubicacion : app-vulnerable/frontend/src/environments/environment.prod.ts:5-5
+  Mensaje   : Secreto/credencial fijado en codigo del frontend (CWE-540/CWE-798). Todo lo que se compila en el bundle Angular es publico: un JWT secret, una API key del backend o una clave simetrica no pueden vivir en environments/*. Evidencia: src/envir
+  CWE       : CWE-540: Inclusion of Sensitive Information in Source Code, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : erpApiKey en bundle; el frontend inyecta X-Api-Key a /admin/ y /erp/.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-ts-secretos-hardcodeados
+  Ubicacion : app-vulnerable/frontend/src/environments/environment.prod.ts:6-6
+  Mensaje   : Secreto/credencial fijado en codigo del frontend (CWE-540/CWE-798). Todo lo que se compila en el bundle Angular es publico: un JWT secret, una API key del backend o una clave simetrica no pueden vivir en environments/*. Evidencia: src/envir
+  CWE       : CWE-540: Inclusion of Sensitive Information in Source Code, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : jwtSharedSecret en bundle: permite forjar tokens (con backend que no verifica la firma, es una backdoor).
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-ts-secretos-hardcodeados
+  Ubicacion : app-vulnerable/frontend/src/environments/environment.ts:11-11
+  Mensaje   : Secreto/credencial fijado en codigo del frontend (CWE-540/CWE-798). Todo lo que se compila en el bundle Angular es publico: un JWT secret, una API key del backend o una clave simetrica no pueden vivir en environments/*. Evidencia: src/envir
+  CWE       : CWE-540: Inclusion of Sensitive Information in Source Code, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Mismo hallazgo en dev.
+------------------------------------------------------------------------------
+[ERROR] seguridad.semgrep.reglas.opc-ts-secretos-hardcodeados
+  Ubicacion : app-vulnerable/frontend/src/environments/environment.ts:12-12
+  Mensaje   : Secreto/credencial fijado en codigo del frontend (CWE-540/CWE-798). Todo lo que se compila en el bundle Angular es publico: un JWT secret, una API key del backend o una clave simetrica no pueden vivir en environments/*. Evidencia: src/envir
+  CWE       : CWE-540: Inclusion of Sensitive Information in Source Code, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Mismo hallazgo en dev.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-cors-permisivo
+  Ubicacion : app-vulnerable/backend/config.py:49-49
+  Mensaje   : Configuracion CORS permisiva (CWE-942 / OWASP A05:2021). Permitir cualquier origen (CORS_ORIGINS = '*') junto con supports_credentials=True permite a sitios maliciosos leer respuestas autenticadas del navegador. Evidencia: config.py:49 y ap
+  CWE       : CWE-942: Permissive Cross-domain Policy with Untrusted Domains
+  OWASP     : A05:2021 - Security Misconfiguration
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : CORS_ORIGINS='*' con supports_credentials=True amplifica riesgos de robo de sesion por CSRF/CORS.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-secreto-por-defecto
+  Ubicacion : app-vulnerable/backend/config.py:13-13
+  Mensaje   : Secreto cargado con entorno pero con valor por defecto hardcodeado (CWE-256). Si la variable no esta definida se usa el valor literal del codigo: es un secreto de respaldo predecible. Evidencia: config.py:13 (SECRET_KEY con default "opc_sup
+  CWE       : CWE-256: Plaintext Storage of a Password
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : SECRET_KEY con default hardcodeado y JWT_SECRET fijo falla el requisito de cambio de secreto.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-secretos-hardcodeados
+  Ubicacion : app-vulnerable/backend/config.py:16-16
+  Mensaje   : Secreto/credencial fijado en el codigo o valor por defecto de un secreto (CWE-798 / CWE-256). Evidencia conocida en config.py: SECRET_KEY, JWT_SECRET, SMTP_PASSWORD, AWS_*, INTERNAL_API_KEY, FIELD_ENCRYPTION_KEY. Correccion: inyectarlos por
+  CWE       : CWE-256: Plaintext Storage of a Password, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : JWT_SECRET fijo en codigo: permite forjar tokens de cualquier rol.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-secretos-hardcodeados
+  Ubicacion : app-vulnerable/backend/config.py:17-17
+  Mensaje   : Secreto/credencial fijado en el codigo o valor por defecto de un secreto (CWE-798 / CWE-256). Evidencia conocida en config.py: SECRET_KEY, JWT_SECRET, SMTP_PASSWORD, AWS_*, INTERNAL_API_KEY, FIELD_ENCRYPTION_KEY. Correccion: inyectarlos por
+  CWE       : CWE-256: Plaintext Storage of a Password, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : JWT_ALGORITHM es config de algoritmo, no secreto.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-secretos-hardcodeados
+  Ubicacion : app-vulnerable/backend/config.py:26-26
+  Mensaje   : Secreto/credencial fijado en el codigo o valor por defecto de un secreto (CWE-798 / CWE-256). Evidencia conocida en config.py: SECRET_KEY, JWT_SECRET, SMTP_PASSWORD, AWS_*, INTERNAL_API_KEY, FIELD_ENCRYPTION_KEY. Correccion: inyectarlos por
+  CWE       : CWE-256: Plaintext Storage of a Password, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : SMTP_PASSWORD hardcodeado.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-secretos-hardcodeados
+  Ubicacion : app-vulnerable/backend/config.py:28-28
+  Mensaje   : Secreto/credencial fijado en el codigo o valor por defecto de un secreto (CWE-798 / CWE-256). Evidencia conocida en config.py: SECRET_KEY, JWT_SECRET, SMTP_PASSWORD, AWS_*, INTERNAL_API_KEY, FIELD_ENCRYPTION_KEY. Correccion: inyectarlos por
+  CWE       : CWE-256: Plaintext Storage of a Password, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : AWS credentials hardcodeadas (values de ejemplo publicos, pero el patron es incorrecto).
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-secretos-hardcodeados
+  Ubicacion : app-vulnerable/backend/config.py:31-31
+  Mensaje   : Secreto/credencial fijado en el codigo o valor por defecto de un secreto (CWE-798 / CWE-256). Evidencia conocida en config.py: SECRET_KEY, JWT_SECRET, SMTP_PASSWORD, AWS_*, INTERNAL_API_KEY, FIELD_ENCRYPTION_KEY. Correccion: inyectarlos por
+  CWE       : CWE-256: Plaintext Storage of a Password, CWE-798: Use of Hard-coded Credentials
+  OWASP     : A07:2021 - Identification and Authentication Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : INTERNAL_API_KEY fija y compartida con el bundle del frontend (rompe la confianza del canal interno).
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-aes-ecb
+  Ubicacion : app-vulnerable/backend/core/security.py:96-96
+  Mensaje   : Uso de AES en modo ECB (CWE-327/CWE-1130). ECB cifra cada bloque de 16 bytes de forma independiente: los patrones de los datos se conservan y permiten ataques de analisis de bloques. Evidencia: core/security.py:96 y :103 (FIELD_ENCRYPTION_K
+  CWE       : CWE-1130: Insufficient Entropy, CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Cifrado AES-ECB con clave fija (128 bits) en FIELD_ENCRYPTION_KEY.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-aes-ecb
+  Ubicacion : app-vulnerable/backend/core/security.py:103-103
+  Mensaje   : Uso de AES en modo ECB (CWE-327/CWE-1130). ECB cifra cada bloque de 16 bytes de forma independiente: los patrones de los datos se conservan y permiten ataques de analisis de bloques. Evidencia: core/security.py:96 y :103 (FIELD_ENCRYPTION_K
+  CWE       : CWE-1130: Insufficient Entropy, CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo modo ECB en descifrado.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-md5-crypto
+  Ubicacion : app-vulnerable/backend/core/security.py:22-22
+  Mensaje   : Uso de MD5 (CWE-327). MD5 no es resistente a colisiones y no debe usarse como hash de contrasenas ni en contextos criptograficos (firmas, MAC). Evidencia: core/security.py:22 y :27 (hash_password/verificar_password). Triage necesario: en se
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : MD5 como hash de contraseña (hash_password).
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-md5-crypto
+  Ubicacion : app-vulnerable/backend/core/security.py:27-27
+  Mensaje   : Uso de MD5 (CWE-327). MD5 no es resistente a colisiones y no debe usarse como hash de contrasenas ni en contextos criptograficos (firmas, MAC). Evidencia: core/security.py:22 y :27 (hash_password/verificar_password). Triage necesario: en se
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : MD5 para verificar contraseña (verificar_password).
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-md5-crypto
+  Ubicacion : app-vulnerable/backend/services/cache_service.py:18-18
+  Mensaje   : Uso de MD5 (CWE-327). MD5 no es resistente a colisiones y no debe usarse como hash de contrasenas ni en contextos criptograficos (firmas, MAC). Evidencia: core/security.py:22 y :27 (hash_password/verificar_password). Triage necesario: en se
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Clave de cache, no criptografico.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-md5-crypto
+  Ubicacion : app-vulnerable/backend/services/cache_service.py:50-50
+  Mensaje   : Uso de MD5 (CWE-327). MD5 no es resistente a colisiones y no debe usarse como hash de contrasenas ni en contextos criptograficos (firmas, MAC). Evidencia: core/security.py:22 y :27 (hash_password/verificar_password). Triage necesario: en se
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Checksum de deduplicacion, no criptografico.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-tls-sin-verificar
+  Ubicacion : app-vulnerable/backend/services/notification_service.py:22-22
+  Mensaje   : Verificacion de TLS desactivada (CWE-295). Deshabilitar la validacion del certificado permite ataques de intermediario (MITM) sobre credenciales o datos. Evidencia: services/notification_service.py:22 (ssl._create_unverified_context) y :36 
+  CWE       : CWE-295: Improper Certificate Validation
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Baja
+  Nota      : ssl._create_unverified_context() para SMTP.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-python-tls-sin-verificar
+  Ubicacion : app-vulnerable/backend/services/notification_service.py:32-38
+  Mensaje   : Verificacion de TLS desactivada (CWE-295). Deshabilitar la validacion del certificado permite ataques de intermediario (MITM) sobre credenciales o datos. Evidencia: services/notification_service.py:22 (ssl._create_unverified_context) y :36 
+  CWE       : CWE-295: Improper Certificate Validation
+  OWASP     : A02:2021 - Cryptographic Failures
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Alta
+  Nota      : requests verify=False en enviar_webhook; combinado con URL arbitraria del usuario configura SSRF + man-in-the-middle.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-ts-innerhtml-inseguro
+  Ubicacion : app-vulnerable/frontend/src/app/features/login/login.component.ts:15-15
+  Mensaje   : Uso de [innerHTML] con contenido arbitrario (CWE-79, OWASP A03:2021). Al inyectar HTML directamente se desactiva la sanitizacion de Angular. Evidencia: login.component.ts:15 (error del backend), admin-console preview, ticket-detail [innerHT
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : [innerHTML] con el error del backend; el mensaje de /api/auth/login incluye texto controlado (username), permite XSS reflejado.
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-ts-marked-inseguro
+  Ubicacion : app-vulnerable/frontend/src/app/features/tickets/ticket-detail.component.ts:30-30
+  Mensaje   : marked.parse() sobre contenido que luego se inyecta con [innerHTML] (CWE-79). marked (4.0.10) no sanitiza HTML embebido en el Markdown; el texto del ticket/comentario puede convertirse en HTML ejecutable. Evidencia: ticket-detail.component.
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : marked.parse sobre la descripcion del ticket y luego [innerHTML] en la vista (XSS almacenado).
+------------------------------------------------------------------------------
+[WARNING] seguridad.semgrep.reglas.opc-ts-marked-inseguro
+  Ubicacion : app-vulnerable/frontend/src/app/features/tickets/ticket-detail.component.ts:34-34
+  Mensaje   : marked.parse() sobre contenido que luego se inyecta con [innerHTML] (CWE-79). marked (4.0.10) no sanitiza HTML embebido en el Markdown; el texto del ticket/comentario puede convertirse en HTML ejecutable. Evidencia: ticket-detail.component.
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation
+  OWASP     : A03:2021 - Injection
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : marked.parse sobre comentarios (XSS almacenado).
+------------------------------------------------------------------------------
+[INFO] seguridad.semgrep.reglas.opc-python-debug-produccion
+  Ubicacion : app-vulnerable/backend/app.py:96-96
+  Mensaje   : Aplicacion ejecutada con debug/flask dev server conectado a 0.0.0.0 (CWE-453). DEBUG=True reexpone la consola de trazas; el servidor de desarrollo de Flask no debe ser el servidor de produccion. Evidencia: app.py:96 y Config.DEBUG (config.p
+  CWE       : CWE-453: Insecure Default
+  OWASP     : A05:2021 - Security Misconfiguration
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Baja
+  Nota      : app.run 0.0.0.0 es correcto en contenedor; el problema real es DEBUG por defecto en config.
+------------------------------------------------------------------------------
+[INFO] seguridad.semgrep.reglas.opc-python-debug-produccion
+  Ubicacion : app-vulnerable/backend/config.py:51-51
+  Mensaje   : Aplicacion ejecutada con debug/flask dev server conectado a 0.0.0.0 (CWE-453). DEBUG=True reexpone la consola de trazas; el servidor de desarrollo de Flask no debe ser el servidor de produccion. Evidencia: app.py:96 y Config.DEBUG (config.p
+  CWE       : CWE-453: Insecure Default
+  OWASP     : A05:2021 - Security Misconfiguration
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : DEBUG=True por defecto; en produccion no debe activarse.
+------------------------------------------------------------------------------
+[INFO] seguridad.semgrep.reglas.opc-python-exposicion-traceback
+  Ubicacion : app-vulnerable/backend/core/errors.py:28-28
+  Mensaje   : Se devuelven trazas, detalles de error o configuracion interna en la respuesta (CWE-209, OWASP A05:2021). Expone rutas, versiones, consultas y configuracion que facilitan el reconocimiento del atacante. Evidencia: core/errors.py:20-36 (trac
+  CWE       : CWE-209: Generation of Error Message Containing Sensitive Information
+  OWASP     : A05:2021 - Security Misconfiguration
+  Referencias: No disponible
+  Triage    : True positive | Severidad final: Media
+  Nota      : El handler 500 devuelve traceback, tipo y config (DB path y DEBUG).
+------------------------------------------------------------------------------

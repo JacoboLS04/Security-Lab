@@ -5,11 +5,13 @@ Despliegue con **alta disponibilidad** de la API `opc-tickets` (backend Flask de
 para **Debian 12** y **Rocky Linux 9**, con **persistencia de datos mediante
 Docker named volumes**.
 
-> **Estado de evidencias (importante):** el stack se validó y evidenció en el
-> host de desarrollo (carpeta `evidencias/`, §12.4). La ejecución **dentro** de
-> las VMs Debian/Rocky aún no se ha realizado en este equipo (las VMs se crean a
-> mano) y queda anotada como **pendiente** (→ no se afirma que el despliegue
-> esté verificado en las dos distribuciones hasta que exista esa evidencia).
+> **Sobre las evidencias:** este repositorio **no empaqueta capturas de
+> pruebas**. El stack se ha validado en el host de desarrollo y aquí se
+> documentan **comandos y umbrales** para que **tú** hagas y dejes tu propia
+> evidencia (pantallazos / informes con los umbrales que definas). Ver §12.4 y
+> `../docs/infraestructura/redes.md` y `../docs/infraestructura/pruebas-estres.md`.
+> La ejecución **dentro** de las VMs Debian/Rocky queda anotada como
+> **pendiente** hasta que exista esa captura propia.
 
 Este directorio es infraestructura: consume la aplicación original tal cual (la
 única modificación, mínima y opt-in, se documenta en §1).
@@ -91,14 +93,16 @@ proyecto-total/
     │   └── setup_rocky.sh     # Preparacion del SO (Docker + firewalld/SELinux)
     ├── iso/
     │   └── README.md          # ISOs recomendadas y como verificarlas
-    ├── evidencias/            # Salidas reales de las pruebas (§12.4)
     └── README.md              # Esta documentacion
 ```
 
-> El resto de la documentación de la evaluación vive en la raíz del repo:
-> `docs/infraestructura/resumen_para_claude.md` (contexto autosuficiente para
-> validar diagramas con IA) y `docs/seguridad/` (informe SAST + revisión manual,
-> parte 3.4 de la prueba).
+> La documentación complementaria vive en la raíz del repo:
+> - `docs/infraestructura/resumen_para_claude.md` — contexto autosuficiente
+>   para validar diagramas con IA.
+> - `docs/infraestructura/redes.md` — redes: asignación de IPs, tipos de
+>   conexión, DHCP, DNS y flujo de paquetes.
+> - `docs/infraestructura/pruebas-estres.md` — pruebas de carga/estrés del
+>   balanceador con umbrales editables.
 
 **Nota de auditoría (única modificación a la aplicación):**
 `app-vulnerable/backend/config.py` recibe una variable opcional `APP_DATA_DIR`
@@ -119,9 +123,9 @@ FASE 3   Instalar Debian 12 / Rocky Linux 9            [VM]
   ↓
 FASE 4   Configurar SSH (host → VM)                    [HOST → VM]
   ↓
-FASE 5   Ejecutar setup (setup_debian.sh / .rocky.sh)  [SSH · VM]
-  ↓
-FASE 6   Clonar repositorio dentro de la VM            [SSH · VM]
+FASE 5   Ejecutar setup (setup_debian.sh / .rocky.sh)  [SSH · VM]   ─┐
+  ↓                                                                   ├─ intercambiables
+FASE 6   Clonar repositorio dentro de la VM            [SSH · VM]   ─┘
   ↓
 FASE 7   docker compose up -d --build                  [SSH · VM]
   ↓
@@ -175,6 +179,7 @@ opcionalmente, `docker compose` / `curl`.
 | Bash/sed/grep | **No hacen falta en el host** (todo eso ocurre dentro de la VM por SSH) | no hacen falta tampoco (se usan dentro de la VM) |
 | Separador de rutas | El bind `./deploy/nginx.conf` es **relativo** → Compose lo resuelve igual en Windows y Linux | igual |
 | `:z` en volúmenes | Docker Desktop (sin SELinux) **ignora** la opción `z` | en VM Rocky (SELinux) etiqueta el archivo (`:z`); en Debian se ignora |
+| Final de línea de los `.sh` | **Cuidado**: si editas/creas `setup_*.sh` en Windows, pueden guardarse con CRLF y `bash` en la VM fallará (`\r`). El repo fuerza LF con `.gitattributes`; si ya los tienes con CRLF, sánalos en la VM: `sed -i 's/\r$//' setup_debian.sh setup_rocky.sh` (o `dos2unix`) | normalmente LF (sin problema) |
 
 **No dependes en el host de**: Bash, `chmod`, `sed`, `grep`, rutas `/home/...`,
 etc. Todos aparecen solo en `[SSH · VM]` (Linux dentro de la VM, que es correcto).
@@ -313,6 +318,18 @@ openssh-server`). En Rocky Minimal, SSHD ya viene activo.
 
 Aquí **empieza la automatización** (la VM ya existe e instalada).
 
+> **Cómo llega el script a la VM.** El script vive en el repositorio, así que
+> antes de ejecutarlo la VM debe tenerlo: o **clonas primero** (FASE 6) e
+> inviertes el orden, o **copias solo los scripts** con `scp`:
+>
+> ```bash
+> scp -r infraestructura/scripts opc@192.168.56.x:/home/opc/   # [HOST]
+> ssh opc@192.168.56.x "cd /home/opc/scripts && sudo bash setup_debian.sh"  # [HOST→VM]
+> ```
+>
+> Ambos caminos son válidos; las fases 5 y 6 son intercambiables. A partir de
+> este paso `git` ya queda instalado en la VM (lo añaden los scripts).
+
 `[SSH · VM]`, desde el directorio del repositorio clonado/preparado:
 
 ```bash
@@ -425,9 +442,9 @@ for i in $(seq 1 10); do curl -si http://localhost:8080/api/health | grep -i x-r
 
 docker inspect -f '{{.Name}} {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' opc-app-1 opc-app-2
 
-docker logs lb        # access log con $upstream_addr
-docker logs app1      # peticiones de la replica 1
-docker logs app2      # peticiones de la replica 2
+docker compose logs lb   # access log con $upstream_addr (o docker logs opc-lb)
+docker compose logs app1 # peticiones de la replica 1
+docker compose logs app2 # peticiones de la replica 2
 docker inspect -f '{{.Config.User}}' opc-app-1   # opc (no root)
 ```
 
@@ -459,25 +476,28 @@ docker compose start app1 && sleep 20
 for i in $(seq 1 8); do curl -si http://localhost:8080/api/health | grep -i x-replica; done
 ```
 
-### 12.4 Evidencias ya capturadas
+### 12.4 Cómo dejar TU evidencia (pantallazos / umbrales)
 
-La carpeta `infraestructura/evidencias/` contiene salidas reales de estas
-pruebas ejecutadas sobre el deploy en el host de desarrollo (reproducibles con
-los comandos de §12.1–§12.3 y §13.6):
+El repositorio **no incluye las capturas** a propósito: las pruebas se
+reproducen con los comandos de §12.1–§12.3 y §13.6, y el informe final (con los
+**umbrales que tú definas**) lo haces tú. Mínimo recomendado:
 
-| Archivo | Contenido |
-|---|---|
-| `estado-stack.txt` | `compose ps`, red `172.19.0.0/16`, DNS `app1/app2`, volúmenes |
-| `balanceo-roundrobin.txt` | **10 peticiones consecutivas** con `X-Replica` alternando (5+ peticiones exigidas) |
-| `logs-nginx.txt` | access log de Nginx con `$upstream_addr` |
-| `failover.txt` | `stop app1` → 8/8 a `app2` (1 con reintento), `start app1` → reparto reanudado |
-| `persistencia.txt` | `down` + `up -d`: tickets `app1=8`/`app2=7` intactos |
-| `hardening.txt` | usuario no-root, `cap_drop=ALL`, `no-new-privileges`, límites, healthchecks |
+| Qué capturar | Cómo (comando de referencia) | Qué demuestra |
+|---|---|---|
+| Estado del stack | `docker compose ps` (+ `docker inspect -f ...` de usuarios/salud) | 3 servicios `healthy`, no-root |
+| Red y DNS | `docker network inspect opc-tickets_default`; `docker exec lb getent hosts app1 app2` | bridge `172.19.0.0/16`, DNS `app1`/`app2` |
+| Balanceo | `for i in $(seq 1 10); do curl -si http://localhost:8080/api/health \| grep -i x-replica; done` | alternancia `172.19.0.2/.3:5000` |
+| Logs del balanceador | `docker compose logs lb` (log con `$upstream_addr`) | ruta real de cada petición |
+| Failover | `docker compose stop app1` → run peticiones → `start app1` | 8/8 a la réplica viva + reintento Nginx |
+| Persistencia | ejecutar §13.6 (insertar ticket, `down`, `up -d`, contar) | contador intacto tras `down`/`up` |
+| Carga/estrés | `../docs/infraestructura/pruebas-estres.md` | aguante del balanceador con los umbrales que definas |
 
-> **Pendiente**: evidencias de despliegue **dentro** de las VMs Debian 12 y
-> Rocky 9 (crear VMs → FASE 1–9). El análisis de seguridad de la app (SAST
-> backend con Bandit + SAST frontend con ESLint + revisión manual y PoCs) está
-> terminado en `../docs/seguridad/`.
+> Captura pantallazos o redirige a `tee informe-xxx.txt`; el formato del
+> informe y los umbrales de aprobado/fallo (p. ej. RPS mínimo, % de error o
+> latencia máxima) **los dispone el responsable**, no este repo.
+
+> **Pendiente**: capturas de despliegue **dentro** de las VMs Debian 12 y
+> Rocky 9 (crear VMs → FASE 1–9).
 
 ## 13. Persistencia con Docker volumes
 

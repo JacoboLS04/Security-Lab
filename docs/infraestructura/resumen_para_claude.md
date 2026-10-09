@@ -7,8 +7,10 @@
 > implementado.
 >
 > **Etiquetas de estado usadas en todo el documento:**
-> - **[C] Confirmado** → comprobado en código y/o con pruebas ejecutadas (hay
->   evidencia en `infraestructura/evidencias/`).
+> - **[C] Confirmado** → comprobado con pruebas ejecutadas (en el host de
+>   desarrollo). Las **capturas/evidencias** las aporta el responsable del
+>   informe (ver `infraestructura/README.md` §12.4 y `pruebas-estres.md`); este
+>   repositorio no empaqueta archivos de evidencia.
 > - **[I] Inferido** → conclusión razonable a partir del código/configuración,
 >   aún **no** verificada en su entorno real.
 > - **[P] Pendiente** → falta información o falta ejecutar la verificación.
@@ -27,9 +29,7 @@ evaluación proporcionada):
 |---|---|---|
 | §3.1 | API Flask `opc-tickets` con alta disponibilidad: **2 réplicas** + **balanceador** Nginx, todo vía **Docker Compose** en un único host | **[C] implementado y evidenciado** |
 | §3.2 | El mismo despliegue reproducible en **Debian 12** y **Rocky Linux 9**; VMs creadas a mano; automatización solo tras instalar el SO | **[C] preparación documentada** · **[P] evidencia en VMs pendiente** |
-| §3.4 | Análisis estático de la aplicación vulnerable (SAST + revisión manual + clasificación) | **[C] Bandit backend + ESLint frontend + revisión manual** (ver `docs/seguridad/informe-seguridad.md`) |
-| §3.5 | Informe y evidencias de la prueba | **[C] evidencias de infraestructura capturadas** · **[P] despliegue en VMs** |
-| §3.6 | Uso y documentación de herramientas de IA | **[C]** `docs/herramientas-ia.md` |
+| §3.5 | Informe y evidencias de la prueba | **[C] verificaciones ejecutadas y comandos documentados** (capturas/umbrales a cargo del responsable) · **[P] despliegue en VMs** |
 
 **Frontera explícita**: las VMs se crean **manualmente** en VirtualBox (ISO
 propia). No se automatiza Vagrant/VBoxManage/preseed/kickstart/download de ISO.
@@ -41,8 +41,8 @@ propia). No se automatiza Vagrant/VBoxManage/preseed/kickstart/download de ISO.
 - Commits: `6fa8372` (inicial) → `d2e5afa` (app vulnerable) →
   `07fd2db` (importa infraestructura + `.dockerignore` + `config.py`).
 - **[C]** Única modificación al código de la app: `app-vulnerable/backend/config.py`
-  (variable opcional `APP_DATA_DIR`). El resto de la app queda **intacto**
-  (no se ha corregido ninguna vulnerabilidad: es la app vulnerable de la prueba).
+  (variable opcional `APP_DATA_DIR`, usada por la persistencia). El resto de la
+  app queda **intacto**.
 - **[C]** Sin modificar durante esta auditoría final: `compose.yaml`,
   `nginx.conf`, `Dockerfile`, scripts, `.dockerignore`.
 
@@ -125,14 +125,19 @@ sequenceDiagram
     N-->>U: 200 + X-Replica: 172.19.0.3:5000
 ```
 
-[C] Medido: **10 peticiones consecutivas** → 5/5 (o 10/10 alternadas) entre
-`.2` y `.3` (`infraestructura/evidencias/balanceo-roundrobin.txt`).
+[C] Medido durante la ejecución en el host: **10 peticiones consecutivas** →
+5/5 (o 10/10 alternadas) entre `.2` y `.3`. Comando de captura en
+`infraestructura/README.md` §12.4.
 [R] Nota: round-robin **no garantiza 50/50 exacto** en general; aquí
 `worker_processes 1` hace la alternancia estricta a escala de laboratorio.
 
 ---
 
 ## 6. Redes, DNS, DHCP y puertos
+
+> Detalle completo (planos de red, IPAM vs DHCP, DNS, flujo de paquetes) en
+> `docs/infraestructura/redes.md`. Plan de pruebas de carga/estrés en
+> `docs/infraestructura/pruebas-estres.md`.
 
 ### 6.1 Puertos y alcance [C]
 
@@ -182,8 +187,8 @@ sequenceDiagram
   (sin tocar la app).
 - **[C]** Failover: con `docker compose stop app1`, 8/8 peticiones las responde
   `app2` (una mostró `172.19.0.2:5000, 172.19.0.3:5000` = reintento de Nginx).
-  Tras `start app1`, la réplica vuelve a recibir tráfico
-  (`infraestructura/evidencias/failover.txt`).
+  Tras `start app1`, la réplica vuelve a recibir tráfico (comando de captura en
+  `infraestructura/README.md` §12.4).
 - **[C] Limitación de Nginx**: la detección de fallo es **pasiva**
   (`max_fails=1`, `fail_timeout=10s` por defecto; reintento al primer
   `connect`/`read` fallido). No es un healthcheck activo (NGINX Plus); el
@@ -197,9 +202,8 @@ sequenceDiagram
 ## 8. Frontend, backend y base de datos
 
 - **[C] Backend**: desplegado (2 réplicas).
-- **[C] Frontend**: en el repo (`app-vulnerable/frontend`, Angular 15, `marked`,
-  `safe-html.pipe`, `environment.prod.ts` con secretos) pero **NO desplegado**:
-  sin Dockerfile, sin servicio en Compose, sin `dist/`, 404 en `/`.
+- **[C] Frontend**: en el repo (`app-vulnerable/frontend`, Angular 15) pero
+  **NO desplegado**: sin Dockerfile, sin servicio en Compose, sin `dist/`, 404 en `/`.
 - **[C] El backend no sirve estáticos del frontend** (`app.py` solo tiene
   `/api/*` y `/adjuntos/*`).
 - **[C] Base de datos**: SQLite local por réplica en `/app/data` (sin motor
@@ -217,8 +221,8 @@ sequenceDiagram
 
 - **[C]** Named volumes `app-data-1` y `app-data-2`, montados en `/app/data`.
 - **[C]** `docker compose down` **conserva** los volúmenes; `up -d` los
-  reutiliza. Medido: `app1=8` y `app2=7` tickets antes y después de `down`+`up`
-  (`infraestructura/evidencias/persistencia.txt`).
+  reutiliza. Medido durante la ejecución: `app1=8` y `app2=7` tickets antes y
+  después de `down`+`up` (procedimiento en `infraestructura/README.md` §13.6).
 - **[C]** `docker compose down -v` **borra** los volúmenes (pérdida total; el
   siguiente `up` regenera la DB de demo).
 - **[C]** SQLite no compartido entre réplicas (bloqueos/corrupción si se
@@ -271,29 +275,23 @@ Implementado en el contenedor (`[C]`, visto en `docker inspect`):
 - **[R]** mejoras opcionales (no aplicadas): `read_only` rootfs, healthcheck
   activo de Nginx, pin de imagen con digest.
 
-> El análisis de seguridad de la **aplicación** (vulnerabilidades intencionales)
-> está en `docs/seguridad/informe-seguridad.md`; no se corrigió ninguna
-> vulnerabilidad de la app (la corrección de las 2 críticas es bono opcional).
-
 ---
 
-## 12. Evidencias disponibles y pruebas pendientes
+## 12. Estado de pruebas y pendientes
 
-**Disponibles** (`infraestructura/evidencias/*.txt`, salida real): estado del
-stack, red/DNS/volúmenes, **10 peticiones balanceadas**, logs Nginx, failover
-(stop/start + recuperación), persistencia (down/up conserva datos), hardening.
+**Verificaciones ejecutadas en el host de desarrollo** (sin archivos de
+evidencia empaquetados; las **capturas las deja el responsable** por pantallazos
+o informes con umbrales, ver `infraestructura/README.md` §12.4 y
+`redes.md`/`pruebas-estres.md`):
 
-**Seguridad** (`docs/seguridad/`): `sast/bandit-backend.txt` (52 hallazgos),
-`sast/eslint-frontend.txt` (+`.json`), `sast/poc-criticos.txt` (PoC JWT/RCE/XSS),
-`sast/poc-sqli-boolean.txt` (SQLi determinista por réplica),
-`informe-seguridad.md` (22 hallazgos tabulados).
+- Estado del stack (3 servicios `healthy`), red/DNS/volúmenes, **10 peticiones
+  balanceadas** (5/5), failover (stop/start + recuperación), persistencia
+  (down/up conserva datos), hardening (no-root, `cap_drop`, límites).
 
 **Pendientes**:
 - Despliegue y pruebas **dentro** de VMs Debian 12 y Rocky 9 (creadas a mano).
-- (Nota) `node_modules` del frontend quedó instalado para el lint (no se
-  versiona; está en `.gitignore` de la app).
 - Verificación de `enp0s3`/`enp0s8` e IPs reales en cada VM nueva.
-- (Opcional) corrección de las 2 vulnerabilidades críticas (bono).
+- Pruebas de carga/estrés y sus umbrales (a cargo del responsable).
 
 ---
 

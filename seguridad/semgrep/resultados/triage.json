@@ -1,0 +1,397 @@
+{
+  "opc-python-aes-ecb|app-vulnerable/backend/core/security.py:103": {
+    "estado": "True positive",
+    "nota": "Mismo modo ECB en descifrado.",
+    "severidad_final": "Media"
+  },
+  "opc-python-aes-ecb|app-vulnerable/backend/core/security.py:96": {
+    "estado": "True positive",
+    "nota": "Cifrado AES-ECB con clave fija (128 bits) en FIELD_ENCRYPTION_KEY.",
+    "severidad_final": "Media"
+  },
+  "opc-python-cors-permisivo|app-vulnerable/backend/config.py:49": {
+    "estado": "True positive",
+    "nota": "CORS_ORIGINS='*' con supports_credentials=True amplifica riesgos de robo de sesion por CSRF/CORS.",
+    "severidad_final": "Media"
+  },
+  "opc-python-debug-produccion|app-vulnerable/backend/app.py:96": {
+    "estado": "True positive",
+    "nota": "app.run 0.0.0.0 es correcto en contenedor; el problema real es DEBUG por defecto en config.",
+    "severidad_final": "Baja"
+  },
+  "opc-python-debug-produccion|app-vulnerable/backend/config.py:51": {
+    "estado": "True positive",
+    "nota": "DEBUG=True por defecto; en produccion no debe activarse.",
+    "severidad_final": "Media"
+  },
+  "opc-python-entropia-debil-token|app-vulnerable/backend/core/security.py:43": {
+    "estado": "True positive",
+    "nota": "random.seed(time()) permite predecir el codigo de reset en la misma ventana de segundo.",
+    "severidad_final": "Alta"
+  },
+  "opc-python-exposicion-traceback|app-vulnerable/backend/core/errors.py:28": {
+    "estado": "True positive",
+    "nota": "El handler 500 devuelve traceback, tipo y config (DB path y DEBUG).",
+    "severidad_final": "Media"
+  },
+  "opc-python-inyeccion-comando|app-vulnerable/backend/api/admin.py:67": {
+    "estado": "True positive",
+    "nota": "ping -c 1 <host> con shell=True; host del usuario. /api/admin/diagnostico/ping exige admin o soporte, pero permite ejecucion arbitraria de comandos (RCE autenticado).",
+    "severidad_final": "Critica"
+  },
+  "opc-python-inyeccion-comando|app-vulnerable/backend/api/internal.py:35": {
+    "estado": "Needs review",
+    "nota": "Los endpoints /internal requieren require_interno; el propio blueprint NO se registra salvo que INTERNAL_API_ENABLED=True. En el paquete distribuible esta desactivado, por lo que es una exposicion latente.",
+    "severidad_final": "Media"
+  },
+  "opc-python-inyeccion-comando|app-vulnerable/backend/services/export_service.py:41": {
+    "estado": "True positive",
+    "nota": "os.system(comando) donde comando interpola el nombre del archivo de exportacion (mismo entrypoint y dato del usuario que export_service.py:33): inyeccion de comandos via nombre/param con formato.",
+    "severidad_final": "Alta"
+  },
+  "opc-python-inyeccion-comando|app-vulnerable/backend/services/export_service.py:48": {
+    "estado": "True positive",
+    "nota": "subprocess.Popen(cmd, shell=True) con formato_destino provisto al conversor (los formatos se validan en export_service.FORMATOS, lo que reduce el riesgo).",
+    "severidad_final": "Media"
+  },
+  "opc-python-inyeccion-comando|app-vulnerable/backend/services/export_service.py:63": {
+    "estado": "False positive",
+    "nota": "os.system('rm -f <EXPORT_DIR>/*.bak'); no datos del usuario.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-md5-crypto|app-vulnerable/backend/core/security.py:22": {
+    "estado": "True positive",
+    "nota": "MD5 como hash de contraseña (hash_password).",
+    "severidad_final": "Alta"
+  },
+  "opc-python-md5-crypto|app-vulnerable/backend/core/security.py:27": {
+    "estado": "True positive",
+    "nota": "MD5 para verificar contraseña (verificar_password).",
+    "severidad_final": "Alta"
+  },
+  "opc-python-md5-crypto|app-vulnerable/backend/services/cache_service.py:18": {
+    "estado": "False positive",
+    "nota": "Clave de cache, no criptografico.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-md5-crypto|app-vulnerable/backend/services/cache_service.py:50": {
+    "estado": "False positive",
+    "nota": "Checksum de deduplicacion, no criptografico.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/api/admin.py:102": {
+    "estado": "True positive",
+    "nota": "Os.path.join(LOG_DIR, archivo) con lectura de logs; archivo desde query param permite salirse del directorio. Solo admin.",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/api/files.py:26": {
+    "estado": "True positive",
+    "nota": "El control 'if \"..\" in nombre' ocurre ANTES de unquote; ..%2f lo evade y hay lectura de archivos fuera de ADJUNTOS_DIR. Requiere auth para la variante /descargar-seguro; /descargar NO exige auth.",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/api/files.py:47": {
+    "estado": "True positive",
+    "nota": "open(os.path.join(ADJUNTOS_DIR, nombre)) con lectura y respuesta text/html. /api/files/preview NO exige auth: lectura de cualquier archivo legible.",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/api/files.py:71": {
+    "estado": "True positive",
+    "nota": "Escritura en disco con nombre del archivo sin normalizar (subir adjuntos). Exige auth.",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/api/users.py:100": {
+    "estado": "True positive",
+    "nota": "Subida de avatar con nombre sin normalizar (users.py:100). Exige auth.",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/config.py:39": {
+    "estado": "False positive",
+    "nota": "Bibliotecas/constantes config, no datos del usuario.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/config.py:40": {
+    "estado": "False positive",
+    "nota": "Constante de config.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/config.py:41": {
+    "estado": "False positive",
+    "nota": "Constante de config.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/config.py:42": {
+    "estado": "False positive",
+    "nota": "Constante de config.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/core/logging_conf.py:13": {
+    "estado": "False positive",
+    "nota": "Log fijo app.log.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/services/backup_service.py:17": {
+    "estado": "False positive",
+    "nota": "destino con tempfile y uuid; sin dato del usuario.",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/services/backup_service.py:33": {
+    "estado": "False positive",
+    "nota": "El nombre proviene de os.listdir('/tmp') filtrado a opc-*.db.gz (archivos que crea el propio servicio); no hay entrada directa del usuario. Impacto limite a borrado de respaldos antiguos.",
+    "severidad_final": "Baja"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/services/export_service.py:33": {
+    "estado": "True positive",
+    "nota": "Nombre del archivo de exportacion sin normalizar (nombre desde query param en /admin/exportar).",
+    "severidad_final": "Media"
+  },
+  "opc-python-path-traversal-apertura|app-vulnerable/backend/services/import_service.py:53": {
+    "estado": "True positive",
+    "nota": "Escritura de archivos dentro de un zip sin validar los nombres: zip-slip real (importar-zip). Exige auth. CWE-22/CWE-434.",
+    "severidad_final": "Alta"
+  },
+  "opc-python-pickle-inseguro|app-vulnerable/backend/services/import_service.py:18": {
+    "estado": "True positive",
+    "nota": "pickle.loads sobre payload del usuario; /api/importar/paquete solo exige auth. Permite RCE autenticado.",
+    "severidad_final": "Critica"
+  },
+  "opc-python-pickle-inseguro|app-vulnerable/backend/services/import_service.py:31": {
+    "estado": "True positive",
+    "nota": "pickle.loads tras HMAC; el endpoint exige rol admin. La clave HMAC esta expuesta en el frontend, reduce la proteccion.",
+    "severidad_final": "Media"
+  },
+  "opc-python-secreto-por-defecto|app-vulnerable/backend/config.py:13": {
+    "estado": "True positive",
+    "nota": "SECRET_KEY con default hardcodeado y JWT_SECRET fijo falla el requisito de cambio de secreto.",
+    "severidad_final": "Media"
+  },
+  "opc-python-secretos-hardcodeados|app-vulnerable/backend/config.py:16": {
+    "estado": "True positive",
+    "nota": "JWT_SECRET fijo en codigo: permite forjar tokens de cualquier rol.",
+    "severidad_final": "Alta"
+  },
+  "opc-python-secretos-hardcodeados|app-vulnerable/backend/config.py:17": {
+    "estado": "False positive",
+    "nota": "JWT_ALGORITHM es config de algoritmo, no secreto.",
+    "severidad_final": "No aplica"
+  },
+  "opc-python-secretos-hardcodeados|app-vulnerable/backend/config.py:26": {
+    "estado": "True positive",
+    "nota": "SMTP_PASSWORD hardcodeado.",
+    "severidad_final": "Media"
+  },
+  "opc-python-secretos-hardcodeados|app-vulnerable/backend/config.py:28": {
+    "estado": "True positive",
+    "nota": "AWS credentials hardcodeadas (values de ejemplo publicos, pero el patron es incorrecto).",
+    "severidad_final": "Media"
+  },
+  "opc-python-secretos-hardcodeados|app-vulnerable/backend/config.py:31": {
+    "estado": "True positive",
+    "nota": "INTERNAL_API_KEY fija y compartida con el bundle del frontend (rompe la confianza del canal interno).",
+    "severidad_final": "Alta"
+  },
+  "opc-python-sql-construccion-manual|app-vulnerable/backend/api/admin.py:52": {
+    "estado": "True positive",
+    "nota": "Dimension llega por query param sin validacion y se interpola con %s. Confirmado: /api/admin/estadisticas (requiere auth).",
+    "severidad_final": "Media"
+  },
+  "opc-python-sql-construccion-manual|app-vulnerable/backend/api/reports.py:35": {
+    "estado": "True positive",
+    "nota": "Orden llega por query param y se concatena en ORDER BY (requiere auth). Permite inyeccion aunque limitada por GROUP BY.",
+    "severidad_final": "Media"
+  },
+  "opc-python-sql-construccion-manual|app-vulnerable/backend/api/users.py:30": {
+    "estado": "True positive",
+    "nota": "campo y filtro concatenados en LIKE; /api/users/buscar requiere auth y devuelve datos de usuarios.",
+    "severidad_final": "Media"
+  },
+  "opc-python-sql-construccion-manual|app-vulnerable/backend/services/search_service.py:16": {
+    "estado": "True positive",
+    "nota": "SQL por concatenacion con q/estado del usuario. /api/tickets/buscar NO requiere auth (lista y buscar son publicos). Exfiltracion total de la BD sin autenticacion.",
+    "severidad_final": "Critica"
+  },
+  "opc-python-tls-sin-verificar|app-vulnerable/backend/services/notification_service.py:22": {
+    "estado": "True positive",
+    "nota": "ssl._create_unverified_context() para SMTP.",
+    "severidad_final": "Baja"
+  },
+  "opc-python-tls-sin-verificar|app-vulnerable/backend/services/notification_service.py:32": {
+    "estado": "True positive",
+    "nota": "requests verify=False en enviar_webhook; combinado con URL arbitraria del usuario configura SSRF + man-in-the-middle.",
+    "severidad_final": "Alta"
+  },
+  "opc-ts-bypass-security-trust|app-vulnerable/frontend/src/app/shared/safe-html.pipe.ts:14": {
+    "estado": "True positive",
+    "nota": "bypassSecurityTrustHtml anula la sanitizacion; base de la cadena XSS (misma debilidad que la regla estandar angular-bypasssecuritytrust).",
+    "severidad_final": "Media"
+  },
+  "opc-ts-innerhtml-inseguro|app-vulnerable/frontend/src/app/features/login/login.component.ts:15": {
+    "estado": "True positive",
+    "nota": "[innerHTML] con el error del backend; el mensaje de /api/auth/login incluye texto controlado (username), permite XSS reflejado.",
+    "severidad_final": "Media"
+  },
+  "opc-ts-marked-inseguro|app-vulnerable/frontend/src/app/features/tickets/ticket-detail.component.ts:30": {
+    "estado": "True positive",
+    "nota": "marked.parse sobre la descripcion del ticket y luego [innerHTML] en la vista (XSS almacenado).",
+    "severidad_final": "Media"
+  },
+  "opc-ts-marked-inseguro|app-vulnerable/frontend/src/app/features/tickets/ticket-detail.component.ts:34": {
+    "estado": "True positive",
+    "nota": "marked.parse sobre comentarios (XSS almacenado).",
+    "severidad_final": "Media"
+  },
+  "opc-ts-secretos-hardcodeados|app-vulnerable/frontend/src/environments/environment.prod.ts:5": {
+    "estado": "True positive",
+    "nota": "erpApiKey en bundle; el frontend inyecta X-Api-Key a /admin/ y /erp/.",
+    "severidad_final": "Alta"
+  },
+  "opc-ts-secretos-hardcodeados|app-vulnerable/frontend/src/environments/environment.prod.ts:6": {
+    "estado": "True positive",
+    "nota": "jwtSharedSecret en bundle: permite forjar tokens (con backend que no verifica la firma, es una backdoor).",
+    "severidad_final": "Alta"
+  },
+  "opc-ts-secretos-hardcodeados|app-vulnerable/frontend/src/environments/environment.ts:11": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo en dev.",
+    "severidad_final": "Alta"
+  },
+  "opc-ts-secretos-hardcodeados|app-vulnerable/frontend/src/environments/environment.ts:12": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo en dev.",
+    "severidad_final": "Alta"
+  },
+  "python.django.security.injection.raw-html-format.raw-html-format|app-vulnerable/backend/api/tickets.py:187": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo tickets.py:187.",
+    "severidad_final": "Media"
+  },
+  "python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute|app-vulnerable/backend/api/admin.py:51": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo que admin.py:52.",
+    "severidad_final": "Media"
+  },
+  "python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host|app-vulnerable/backend/app.py:96": {
+    "estado": "False positive",
+    "nota": "El bind 0.0.0.0 es necesario dentro del contenedor; el riesgo real es DEBUG por defecto, cubierto por opc-python-debug-produccion (config.py:51).",
+    "severidad_final": "No aplica"
+  },
+  "python.flask.security.injection.raw-html-concat.raw-html-format|app-vulnerable/backend/api/tickets.py:142": {
+    "estado": "True positive",
+    "nota": "vista_html une campos del ticket en HTML; contenido inyectable llega al navegador con mimetype text/html.",
+    "severidad_final": "Media"
+  },
+  "python.flask.security.injection.raw-html-concat.raw-html-format|app-vulnerable/backend/api/tickets.py:187": {
+    "estado": "True positive",
+    "nota": "etiqueta construye HTML por concatenacion con texto/color del usuario (reflejado).",
+    "severidad_final": "Media"
+  },
+  "python.flask.security.injection.subprocess-injection.subprocess-injection|app-vulnerable/backend/api/admin.py:67": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom admin.py:67.",
+    "severidad_final": "Critica"
+  },
+  "python.flask.security.injection.tainted-sql-string.tainted-sql-string|app-vulnerable/backend/api/admin.py:52": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo que la regla custom admin.py:52.",
+    "severidad_final": "Media"
+  },
+  "python.flask.security.injection.tainted-sql-string.tainted-sql-string|app-vulnerable/backend/api/reports.py:35": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo que la regla custom reports.py:35.",
+    "severidad_final": "Media"
+  },
+  "python.flask.security.injection.tainted-sql-string.tainted-sql-string|app-vulnerable/backend/api/tickets.py:105": {
+    "estado": "True positive",
+    "nota": "UPDATE tickets con campos del usuario concatenados por .format; permite alterar filas ajenas (IDOR+escritura). Requiere auth.",
+    "severidad_final": "Critica"
+  },
+  "python.flask.security.injection.tainted-sql-string.tainted-sql-string|app-vulnerable/backend/api/tickets.py:35": {
+    "estado": "True positive",
+    "nota": "limite/offset convertidos a int (menor riesgo) pero columna/direccion provienen de seleccion acotada. El casi-real es tickets.py:105.",
+    "severidad_final": "Media"
+  },
+  "python.flask.security.injection.tainted-sql-string.tainted-sql-string|app-vulnerable/backend/api/users.py:30": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo que la regla custom users.py:30.",
+    "severidad_final": "Media"
+  },
+  "python.jwt.security.unverified-jwt-decode.unverified-jwt-decode|app-vulnerable/backend/core/security.py:77": {
+    "estado": "True positive",
+    "nota": "leer_claims con verify_signature=False usado por require_auth y require_rol; el token no se verifica. Cualquiera puede presentar claims propios (cambiar rol/uid). ",
+    "severidad_final": "Critica"
+  },
+  "python.lang.security.audit.insecure-file-permissions.insecure-file-permissions|app-vulnerable/backend/api/users.py:102": {
+    "estado": "True positive",
+    "nota": "chmod 0o777 sobre archivo subido (avatar).",
+    "severidad_final": "Baja"
+  },
+  "python.lang.security.audit.insecure-file-permissions.insecure-file-permissions|app-vulnerable/backend/core/logging_conf.py:20": {
+    "estado": "True positive",
+    "nota": "chmod 0o666 sobre app.log.",
+    "severidad_final": "Baja"
+  },
+  "python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure|app-vulnerable/backend/api/auth.py:30": {
+    "estado": "True positive",
+    "nota": "login() registra la password en texto plano en los logs.",
+    "severidad_final": "Alta"
+  },
+  "python.lang.security.audit.md5-used-as-password.md5-used-as-password|app-vulnerable/backend/core/security.py:22": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom security.py:22.",
+    "severidad_final": "Alta"
+  },
+  "python.lang.security.audit.md5-used-as-password.md5-used-as-password|app-vulnerable/backend/core/security.py:27": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom security.py:27.",
+    "severidad_final": "Alta"
+  },
+  "python.lang.security.audit.subprocess-shell-true.subprocess-shell-true|app-vulnerable/backend/api/admin.py:68": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom admin.py:67.",
+    "severidad_final": "Critica"
+  },
+  "python.lang.security.audit.subprocess-shell-true.subprocess-shell-true|app-vulnerable/backend/services/export_service.py:48": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom export_service.py:48.",
+    "severidad_final": "Media"
+  },
+  "python.lang.security.dangerous-subprocess-use.dangerous-subprocess-use|app-vulnerable/backend/api/admin.py:68": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom admin.py:67.",
+    "severidad_final": "Critica"
+  },
+  "python.lang.security.deserialization.avoid-pyyaml-load.avoid-pyyaml-load|app-vulnerable/backend/services/import_service.py:36": {
+    "estado": "True positive",
+    "nota": "yaml.load con Loader=yaml.Loader inseguro (puede construir objetos arbitrarios).",
+    "severidad_final": "Media"
+  },
+  "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5|app-vulnerable/backend/core/security.py:22": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom security.py:22.",
+    "severidad_final": "Alta"
+  },
+  "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5|app-vulnerable/backend/core/security.py:27": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom security.py:27.",
+    "severidad_final": "Alta"
+  },
+  "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5|app-vulnerable/backend/services/cache_service.py:18": {
+    "estado": "False positive",
+    "nota": "Clave de cache, no criptografico.",
+    "severidad_final": "No aplica"
+  },
+  "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5|app-vulnerable/backend/services/cache_service.py:50": {
+    "estado": "False positive",
+    "nota": "Checksum de deduplicacion.",
+    "severidad_final": "No aplica"
+  },
+  "python.lang.security.unverified-ssl-context.unverified-ssl-context|app-vulnerable/backend/services/notification_service.py:22": {
+    "estado": "True positive",
+    "nota": "Mismo hallazgo custom notification_service.py:22.",
+    "severidad_final": "Baja"
+  },
+  "typescript.angular.security.audit.angular-domsanitizer.angular-bypasssecuritytrust|app-vulnerable/frontend/src/app/shared/safe-html.pipe.ts:14": {
+    "estado": "True positive",
+    "nota": "bypassSecurityTrustHtml anula la sanitizacion; base de la cadena XSS.",
+    "severidad_final": "Media"
+  }
+}

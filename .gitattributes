@@ -1,0 +1,9 @@
+# Fuerza final de línea LF en archivos que se ejecutan/leen como texto en Linux.
+# Evita que un checkout/edición desde Windows (CRLF) rompa los scripts bash
+# dentro de las VMs (bash falla con "\r") y los manifiestos/conf de Docker.
+*.sh text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.conf text eol=lf
+*.md text eol=lf

@@ -1,0 +1,251 @@
+REPORTE SAST - Semgrep v1.180.0
+
+Resultados totales en JSON: 27
+Resultados mostrados: 27 (ERROR=12, WARNING=15, INFO=0)
+Filtro min-severity: ninguno
+Errores de ejecucion de Semgrep: 0
+
+==============================================================================
+[ERROR] python.flask.security.injection.subprocess-injection.subprocess-injection
+  Ubicacion : app-vulnerable/backend/api/admin.py:67-69
+  Mensaje   : Detected user input entering a `subprocess` call unsafely. This could result in a command injection vulnerability. An attacker could use this vulnerability to execute arbitrary commands on the host, which allows them to download malware, sc
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://semgrep.dev/docs/cheat-sheets/python-command-injection/
+  Triage    : True positive | Severidad final: Critica
+  Nota      : Mismo hallazgo custom admin.py:67.
+------------------------------------------------------------------------------
+[ERROR] python.flask.security.injection.tainted-sql-string.tainted-sql-string
+  Ubicacion : app-vulnerable/backend/api/admin.py:52-55
+  Mensaje   : Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the dat
+  CWE       : CWE-704: Incorrect Type Conversion or Cast
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql, https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm, https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-more-specific-text-with-table-expression-literal-column-and-expression-column
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo hallazgo que la regla custom admin.py:52.
+------------------------------------------------------------------------------
+[ERROR] python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
+  Ubicacion : app-vulnerable/backend/api/admin.py:68-68
+  Mensaje   : Found 'subprocess' function 'check_output' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malic
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess, https://docs.python.org/3/library/subprocess.html
+  Triage    : True positive | Severidad final: Critica
+  Nota      : Mismo hallazgo custom admin.py:67.
+------------------------------------------------------------------------------
+[ERROR] python.lang.security.dangerous-subprocess-use.dangerous-subprocess-use
+  Ubicacion : app-vulnerable/backend/api/admin.py:68-68
+  Mensaje   : Detected subprocess function 'check_output' with user controlled data. A malicious actor could leverage this to perform command injection. You may consider using 'shlex.escape()'.
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess, https://docs.python.org/3/library/subprocess.html, https://docs.python.org/3/library/shlex.html, https://semgrep.dev/docs/cheat-sheets/python-command-injection/
+  Triage    : True positive | Severidad final: Critica
+  Nota      : Mismo hallazgo custom admin.py:67.
+------------------------------------------------------------------------------
+[ERROR] python.flask.security.injection.tainted-sql-string.tainted-sql-string
+  Ubicacion : app-vulnerable/backend/api/reports.py:35-38
+  Mensaje   : Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the dat
+  CWE       : CWE-704: Incorrect Type Conversion or Cast
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql, https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm, https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-more-specific-text-with-table-expression-literal-column-and-expression-column
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo hallazgo que la regla custom reports.py:35.
+------------------------------------------------------------------------------
+[ERROR] python.flask.security.injection.tainted-sql-string.tainted-sql-string
+  Ubicacion : app-vulnerable/backend/api/tickets.py:35-37
+  Mensaje   : Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the dat
+  CWE       : CWE-704: Incorrect Type Conversion or Cast
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql, https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm, https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-more-specific-text-with-table-expression-literal-column-and-expression-column
+  Triage    : True positive | Severidad final: Media
+  Nota      : limite/offset convertidos a int (menor riesgo) pero columna/direccion provienen de seleccion acotada. El casi-real es tickets.py:105.
+------------------------------------------------------------------------------
+[ERROR] python.flask.security.injection.tainted-sql-string.tainted-sql-string
+  Ubicacion : app-vulnerable/backend/api/tickets.py:105-105
+  Mensaje   : Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the dat
+  CWE       : CWE-704: Incorrect Type Conversion or Cast
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql, https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm, https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-more-specific-text-with-table-expression-literal-column-and-expression-column
+  Triage    : True positive | Severidad final: Critica
+  Nota      : UPDATE tickets con campos del usuario concatenados por .format; permite alterar filas ajenas (IDOR+escritura). Requiere auth.
+------------------------------------------------------------------------------
+[ERROR] python.flask.security.injection.tainted-sql-string.tainted-sql-string
+  Ubicacion : app-vulnerable/backend/api/users.py:30-33
+  Mensaje   : Detected user input used to manually construct a SQL string. This is usually bad practice because manual construction could accidentally result in a SQL injection. An attacker could use a SQL injection to steal or modify contents of the dat
+  CWE       : CWE-704: Incorrect Type Conversion or Cast
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-textual-sql, https://www.tutorialspoint.com/sqlalchemy/sqlalchemy_quick_guide.htm, https://docs.sqlalchemy.org/en/14/core/tutorial.html#using-more-specific-text-with-table-expression-literal-column-and-expression-column
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo hallazgo que la regla custom users.py:30.
+------------------------------------------------------------------------------
+[ERROR] python.jwt.security.unverified-jwt-decode.unverified-jwt-decode
+  Ubicacion : app-vulnerable/backend/core/security.py:77-77
+  Mensaje   : Detected JWT token decoded with 'verify=False'. This bypasses any integrity checks for the token which means the token could be tampered with by malicious actors. Ensure that the JWT token is verified.
+  CWE       : CWE-287: Improper Authentication
+  OWASP     : A02:2017 - Broken Authentication, A07:2021 - Identification and Authentication Failures, A07:2025 - Authentication Failures
+  Referencias: https://github.com/we45/Vulnerable-Flask-App/blob/752ee16087c0bfb79073f68802d907569a1f0df7/app/app.py#L96
+  Triage    : True positive | Severidad final: Critica
+  Nota      : leer_claims con verify_signature=False usado por require_auth y require_rol; el token no se verifica. Cualquiera puede presentar claims propios (cambiar rol/uid). 
+------------------------------------------------------------------------------
+[ERROR] python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
+  Ubicacion : app-vulnerable/backend/services/export_service.py:48-48
+  Mensaje   : Found 'subprocess' function 'Popen' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious ac
+  CWE       : CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess, https://docs.python.org/3/library/subprocess.html
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo hallazgo custom export_service.py:48.
+------------------------------------------------------------------------------
+[ERROR] python.lang.security.deserialization.avoid-pyyaml-load.avoid-pyyaml-load
+  Ubicacion : app-vulnerable/backend/services/import_service.py:36-36
+  Mensaje   : Detected a possible YAML deserialization vulnerability. `yaml.unsafe_load`, `yaml.Loader`, `yaml.CLoader`, and `yaml.UnsafeLoader` are all known to be unsafe methods of deserializing YAML. An attacker with control over the YAML input could 
+  CWE       : CWE-502: Deserialization of Untrusted Data
+  OWASP     : A08:2017 - Insecure Deserialization, A08:2021 - Software and Data Integrity Failures, A08:2025 - Software or Data Integrity Failures
+  Referencias: https://github.com/yaml/pyyaml/wiki/PyYAML-yaml.load(input)-Deprecation, https://nvd.nist.gov/vuln/detail/CVE-2017-18342
+  Triage    : True positive | Severidad final: Media
+  Nota      : yaml.load con Loader=yaml.Loader inseguro (puede construir objetos arbitrarios).
+------------------------------------------------------------------------------
+[ERROR] python.lang.security.unverified-ssl-context.unverified-ssl-context
+  Ubicacion : app-vulnerable/backend/services/notification_service.py:22-22
+  Mensaje   : Unverified SSL context detected. This will permit insecure connections without verifying SSL certificates. Use 'ssl.create_default_context' instead.
+  CWE       : CWE-295: Improper Certificate Validation
+  OWASP     : A03:2017 - Sensitive Data Exposure, A07:2021 - Identification and Authentication Failures, A07:2025 - Authentication Failures
+  Referencias: https://docs.python.org/3/library/ssl.html#ssl-security, https://docs.python.org/3/library/http.client.html#http.client.HTTPSConnection
+  Triage    : True positive | Severidad final: Baja
+  Nota      : Mismo hallazgo custom notification_service.py:22.
+------------------------------------------------------------------------------
+[WARNING] python.django.security.injection.sql.sql-injection-using-db-cursor-execute.sql-injection-db-cursor-execute
+  Ubicacion : app-vulnerable/backend/api/admin.py:51-56
+  Mensaje   : User-controlled data from a request is passed to 'execute()'. This could lead to a SQL injection and therefore protected information could be leaked. Instead, use django's QuerySets, which are built with query parameterization and therefore
+  CWE       : CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')
+  OWASP     : A01:2017 - Injection, A03:2021 - Injection, A05:2025 - Injection
+  Referencias: https://docs.djangoproject.com/en/3.0/topics/security/#sql-injection-protection
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo hallazgo que admin.py:52.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.audit.logging.logger-credential-leak.python-logger-credential-disclosure
+  Ubicacion : app-vulnerable/backend/api/auth.py:30-31
+  Mensaje   : Detected a python logger call with a potential hardcoded secret "Intento de login usuario=%s password=%s ip=%s" being logged. This may lead to secret credentials being exposed. Make sure that the logger is not logging  sensitive information
+  CWE       : CWE-532: Insertion of Sensitive Information into Log File
+  OWASP     : A09:2021 - Security Logging and Monitoring Failures, A09:2025 - Security Logging & Alerting Failures
+  Referencias: https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures
+  Triage    : True positive | Severidad final: Alta
+  Nota      : login() registra la password en texto plano en los logs.
+------------------------------------------------------------------------------
+[WARNING] python.django.security.injection.raw-html-format.raw-html-format
+  Ubicacion : app-vulnerable/backend/api/tickets.py:187-191
+  Mensaje   : Detected user input flowing into a manually constructed HTML string. You may be accidentally bypassing secure methods of rendering HTML by manually constructing HTML and this could create a cross-site scripting vulnerability, which could le
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')
+  OWASP     : A03:2021 - Injection, A05:2025 - Injection, A07:2017 - Cross-Site Scripting (XSS)
+  Referencias: https://docs.djangoproject.com/en/3.2/topics/http/shortcuts/#render, https://docs.djangoproject.com/en/3.2/topics/security/#cross-site-scripting-xss-protection
+  Triage    : True positive | Severidad final: Media
+  Nota      : Mismo hallazgo tickets.py:187.
+------------------------------------------------------------------------------
+[WARNING] python.flask.security.injection.raw-html-concat.raw-html-format
+  Ubicacion : app-vulnerable/backend/api/tickets.py:142-149
+  Mensaje   : Detected user input flowing into a manually constructed HTML string. You may be accidentally bypassing secure methods of rendering HTML by manually constructing HTML and this could create a cross-site scripting vulnerability, which could le
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')
+  OWASP     : A03:2021 - Injection, A05:2025 - Injection, A07:2017 - Cross-Site Scripting (XSS)
+  Referencias: https://flask.palletsprojects.com/en/2.0.x/security/#cross-site-scripting-xss
+  Triage    : True positive | Severidad final: Media
+  Nota      : vista_html une campos del ticket en HTML; contenido inyectable llega al navegador con mimetype text/html.
+------------------------------------------------------------------------------
+[WARNING] python.flask.security.injection.raw-html-concat.raw-html-format
+  Ubicacion : app-vulnerable/backend/api/tickets.py:187-191
+  Mensaje   : Detected user input flowing into a manually constructed HTML string. You may be accidentally bypassing secure methods of rendering HTML by manually constructing HTML and this could create a cross-site scripting vulnerability, which could le
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')
+  OWASP     : A03:2021 - Injection, A05:2025 - Injection, A07:2017 - Cross-Site Scripting (XSS)
+  Referencias: https://flask.palletsprojects.com/en/2.0.x/security/#cross-site-scripting-xss
+  Triage    : True positive | Severidad final: Media
+  Nota      : etiqueta construye HTML por concatenacion con texto/color del usuario (reflejado).
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.audit.insecure-file-permissions.insecure-file-permissions
+  Ubicacion : app-vulnerable/backend/api/users.py:102-102
+  Mensaje   : These permissions `0o777` are widely permissive and grant access to more people than may be necessary. A good default is `0o644` which gives read and write access to yourself and read access to everyone else.
+  CWE       : CWE-276: Incorrect Default Permissions
+  OWASP     : A01:2021 - Broken Access Control, A01:2025 - Broken Access Control
+  Referencias: https://owasp.org/Top10/A01_2021-Broken_Access_Control
+  Triage    : True positive | Severidad final: Baja
+  Nota      : chmod 0o777 sobre archivo subido (avatar).
+------------------------------------------------------------------------------
+[WARNING] python.flask.security.audit.app-run-param-config.avoid_app_run_with_bad_host
+  Ubicacion : app-vulnerable/backend/app.py:96-96
+  Mensaje   : Running flask app with host 0.0.0.0 could expose the server publicly.
+  CWE       : CWE-668: Exposure of Resource to Wrong Sphere
+  OWASP     : A01:2021 - Broken Access Control, A01:2025 - Broken Access Control
+  Referencias: https://owasp.org/Top10/A01_2021-Broken_Access_Control
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : El bind 0.0.0.0 es necesario dentro del contenedor; el riesgo real es DEBUG por defecto, cubierto por opc-python-debug-produccion (config.py:51).
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.audit.insecure-file-permissions.insecure-file-permissions
+  Ubicacion : app-vulnerable/backend/core/logging_conf.py:20-20
+  Mensaje   : These permissions `0o666` are widely permissive and grant access to more people than may be necessary. A good default is `0o644` which gives read and write access to yourself and read access to everyone else.
+  CWE       : CWE-276: Incorrect Default Permissions
+  OWASP     : A01:2021 - Broken Access Control, A01:2025 - Broken Access Control
+  Referencias: https://owasp.org/Top10/A01_2021-Broken_Access_Control
+  Triage    : True positive | Severidad final: Baja
+  Nota      : chmod 0o666 sobre app.log.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.audit.md5-used-as-password.md5-used-as-password
+  Ubicacion : app-vulnerable/backend/core/security.py:22-22
+  Mensaje   : It looks like MD5 is used as a password hash. MD5 is not considered a secure password hash because it can be cracked by an attacker in a short amount of time. Use a suitable password hashing function such as scrypt. You can use `hashlib.scr
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures, A03:2017 - Sensitive Data Exposure, A04:2025 - Cryptographic Failures
+  Referencias: https://tools.ietf.org/html/rfc6151, https://crypto.stackexchange.com/questions/44151/how-does-the-flame-malware-take-advantage-of-md5-collision, https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html, https://security.stackexchange.com/questions/211/how-to-securely-hash-passwords, https://github.com/returntocorp/semgrep-rules/issues/1609, https://docs.python.org/3/library/hashlib.html#hashlib.scrypt
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Mismo hallazgo custom security.py:22.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.audit.md5-used-as-password.md5-used-as-password
+  Ubicacion : app-vulnerable/backend/core/security.py:27-27
+  Mensaje   : It looks like MD5 is used as a password hash. MD5 is not considered a secure password hash because it can be cracked by an attacker in a short amount of time. Use a suitable password hashing function such as scrypt. You can use `hashlib.scr
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures, A03:2017 - Sensitive Data Exposure, A04:2025 - Cryptographic Failures
+  Referencias: https://tools.ietf.org/html/rfc6151, https://crypto.stackexchange.com/questions/44151/how-does-the-flame-malware-take-advantage-of-md5-collision, https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html, https://security.stackexchange.com/questions/211/how-to-securely-hash-passwords, https://github.com/returntocorp/semgrep-rules/issues/1609, https://docs.python.org/3/library/hashlib.html#hashlib.scrypt
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Mismo hallazgo custom security.py:27.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+  Ubicacion : app-vulnerable/backend/core/security.py:22-22
+  Mensaje   : Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures, A03:2017 - Sensitive Data Exposure, A04:2025 - Cryptographic Failures
+  Referencias: https://www.schneier.com/blog/archives/2012/10/when_will_we_se.html, https://www.trendmicro.com/vinfo/us/security/news/vulnerabilities-and-exploits/sha-1-collision-signals-the-end-of-the-algorithm-s-viability, http://2012.sharcs.org/slides/stevens.pdf, https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Mismo hallazgo custom security.py:22.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+  Ubicacion : app-vulnerable/backend/core/security.py:27-27
+  Mensaje   : Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures, A03:2017 - Sensitive Data Exposure, A04:2025 - Cryptographic Failures
+  Referencias: https://www.schneier.com/blog/archives/2012/10/when_will_we_se.html, https://www.trendmicro.com/vinfo/us/security/news/vulnerabilities-and-exploits/sha-1-collision-signals-the-end-of-the-algorithm-s-viability, http://2012.sharcs.org/slides/stevens.pdf, https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html
+  Triage    : True positive | Severidad final: Alta
+  Nota      : Mismo hallazgo custom security.py:27.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+  Ubicacion : app-vulnerable/backend/services/cache_service.py:18-18
+  Mensaje   : Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures, A03:2017 - Sensitive Data Exposure, A04:2025 - Cryptographic Failures
+  Referencias: https://www.schneier.com/blog/archives/2012/10/when_will_we_se.html, https://www.trendmicro.com/vinfo/us/security/news/vulnerabilities-and-exploits/sha-1-collision-signals-the-end-of-the-algorithm-s-viability, http://2012.sharcs.org/slides/stevens.pdf, https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Clave de cache, no criptografico.
+------------------------------------------------------------------------------
+[WARNING] python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5
+  Ubicacion : app-vulnerable/backend/services/cache_service.py:50-50
+  Mensaje   : Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.
+  CWE       : CWE-327: Use of a Broken or Risky Cryptographic Algorithm
+  OWASP     : A02:2021 - Cryptographic Failures, A03:2017 - Sensitive Data Exposure, A04:2025 - Cryptographic Failures
+  Referencias: https://www.schneier.com/blog/archives/2012/10/when_will_we_se.html, https://www.trendmicro.com/vinfo/us/security/news/vulnerabilities-and-exploits/sha-1-collision-signals-the-end-of-the-algorithm-s-viability, http://2012.sharcs.org/slides/stevens.pdf, https://pycryptodome.readthedocs.io/en/latest/src/hash/sha3_256.html
+  Triage    : False positive | Severidad final: No aplica
+  Nota      : Checksum de deduplicacion.
+------------------------------------------------------------------------------
+[WARNING] typescript.angular.security.audit.angular-domsanitizer.angular-bypasssecuritytrust
+  Ubicacion : app-vulnerable/frontend/src/app/shared/safe-html.pipe.ts:14-14
+  Mensaje   : Detected the use of `bypassSecurityTrustHtml`. This can introduce a Cross-Site-Scripting (XSS) vulnerability if this comes from user-provided input. If you have to use `bypassSecurityTrustHtml`, ensure it does not come from user-input or us
+  CWE       : CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')
+  OWASP     : A03:2021 - Injection, A05:2025 - Injection, A07:2017 - Cross-Site Scripting (XSS)
+  Referencias: https://angular.io/api/platform-browser/DomSanitizer, https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+  Triage    : True positive | Severidad final: Media
+  Nota      : bypassSecurityTrustHtml anula la sanitizacion; base de la cadena XSS.
+------------------------------------------------------------------------------

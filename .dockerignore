@@ -3,6 +3,7 @@
 # Excluye del contexto todo lo que la imagen de la API no necesita.
 .git
 .gitignore
+.gitattributes
 **/node_modules
 **/dist
 **/__pycache__
@@ -10,3 +11,8 @@
 **/*.db
 **/*.log
 infraestructura/.env
+# No aportan nada a la imagen de la API: documentacion y evidencias solo
+# engordan el contexto de build.
+docs
+infraestructura/evidencias/
+infraestructura/iso/
